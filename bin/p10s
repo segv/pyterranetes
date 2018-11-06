@@ -1,0 +1,24 @@
+#!/usr/bin/env python3
+import click
+from pprint import pprint  # noqa: F401
+from conf_obj.engine import Compiler
+
+
+@click.group()
+def cli():
+    pass
+
+
+@cli.command()
+@click.option('--output',
+              default=None,
+              type=click.Path(exists=False,
+                              allow_dash=True))
+@click.argument('filename', nargs=-1)
+def generate(output, filename):
+    for f in filename:
+        Compiler(f).compile(output=output)
+
+
+if __name__ == '__main__':
+    cli()
