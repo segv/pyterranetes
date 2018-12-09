@@ -1,5 +1,5 @@
-import hcl as pyhcl
 from copy import deepcopy
+from p10s.loads import hcl
 
 
 class Configuration():
@@ -51,8 +51,8 @@ class Configuration():
     def local(self, name, block):
         self._merge_in({'locals': {name: block}})
 
-    def hcl(self, hcl):
-        self._merge_in(pyhcl.loads(hcl))
+    def hcl(self, hcl_data):
+        self._merge_in((hcl(hcl_data)))
 
     def __iadd__(self, block):
         self._merge_in(block.data)
