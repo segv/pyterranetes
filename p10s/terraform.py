@@ -1,31 +1,12 @@
 from copy import deepcopy
 from p10s.loads import hcl
+from p10s.utils import merge_dicts
 
 
 class Configuration():
     def __init__(self, output=None):
         self.output = output
         self.data = {}
-
-    def _merge_in(self, values):
-        def rec(a, b):
-            for k in b.keys():
-                new = b[k]
-                if isinstance(new, dict):
-                    existing = a.get(k, a)
-                    if existing is a:
-                        a[k] = new
-                    else:
-                        if isinstance(existing, dict):
-                            rec(existing, new)
-                        else:
-                            a[k] = new
-                else:
-                    a[k] = new
-
-        rec(self.data, values)
-
-        return self
 
     def resource(self, type, name, block=None):
         self += Resource(type, name, block)
@@ -47,6 +28,11 @@ class Configuration():
 
     def output(self, name, block):
         self += Output(name, block)
+
+    def _merge_in(self, values):
+        self.data = merge_dicts(self.data, values)
+        return self
+
 
     def local(self, name, block):
         self._merge_in({'locals': {name: block}})
