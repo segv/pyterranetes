@@ -33,7 +33,6 @@ class Configuration():
         self.data = merge_dicts(self.data, values)
         return self
 
-
     def local(self, name, block):
         self._merge_in({'locals': {name: block}})
 
