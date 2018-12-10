@@ -34,7 +34,7 @@ def test_compute_output_file(fixtures_dir):
     assert len(outputs) == 1
     output = outputs[0]
     assert output.input == input
-    assert output.output == input.with_suffix('.tfjson')
+    assert output.output == input.with_suffix('.tf.json')
     assert {'resource':
             {'a':
              {'b': {'count': 1},
@@ -47,7 +47,7 @@ def test_generate(fixtures_dir):
     input = fixtures_dir / 'generator_data' / 'simple' / 'simple.p10s'
     g = Generator()
     g.generate(input)
-    output = fixtures_dir / 'generator_data' / 'simple' / 'simple.tfjson'
+    output = fixtures_dir / 'generator_data' / 'simple' / 'simple.tf.json'
     assert output.exists()
     output_data = json.load(open(output))
     assert {'resource':
@@ -62,7 +62,7 @@ def test_generate_with_lib1(fixtures_dir):
     input = fixtures_dir / 'generator_data' / 'with_lib' / 'top.p10s'
     g = Generator()
     g.generate(input)
-    output = fixtures_dir / 'generator_data' / 'with_lib' / 'top.tfjson'
+    output = fixtures_dir / 'generator_data' / 'with_lib' / 'top.tf.json'
     assert output.exists()
     output_data = json.load(open(output))
     assert {'provider': {'whatever': {}}} == output_data
@@ -72,7 +72,7 @@ def test_generate_with_lib2(fixtures_dir):
     input = fixtures_dir / 'generator_data' / 'with_lib' / 'sub' / 'bottom.p10s'
     g = Generator()
     g.generate(input)
-    output = fixtures_dir / 'generator_data' / 'with_lib' / 'sub' / 'bottom.tfjson'
+    output = fixtures_dir / 'generator_data' / 'with_lib' / 'sub' / 'bottom.tf.json'
     assert output.exists()
     output_data = json.load(open(output))
     assert {'provider': {'whatever': {}}} == output_data

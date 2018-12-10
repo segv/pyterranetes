@@ -10,7 +10,7 @@ class TFContext(BaseContext):
         super().__init__(*args, **kwargs)
         if self.output is None:
             if self.input is not None:
-                self.output = self.input.with_suffix('.tfjson')
+                self.output = self.input.with_suffix('.tf.json')
 
     def resource(self, type, name, body=None):
         self += Resource(type, name, body)
@@ -55,8 +55,8 @@ class TFContext(BaseContext):
         return new.__iadd__(block)
 
     def render(self):
-        with open(self.output, "w") as tfjson:
-            tfjson.write(json.dumps(self.data, indent=4, sort_keys=True))
+        with open(self.output, "w") as tf_json:
+            tf_json.write(json.dumps(self.data, indent=4, sort_keys=True))
 
 
 class TerraformBlock():
