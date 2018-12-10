@@ -1,9 +1,10 @@
 from copy import deepcopy
 from p10s.loads import hcl
 from p10s.utils import merge_dicts
+from p10s.context import BaseContext
 
 
-class Configuration():
+class TFContext(BaseContext):
     def __init__(self, output=None):
         self.output = output
         self.data = {}
@@ -44,9 +45,12 @@ class Configuration():
         return self
 
     def __add__(self, block):
-        new = Configuration(self.output)
+        new = TFContext(self.output)
         new.data = deepcopy(self.data)
         return new.__iadd__(block)
+
+    def render(self):
+        return self.data
 
 
 class TerraformBlock():
