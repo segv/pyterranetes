@@ -40,8 +40,8 @@ class TFContext(BaseContext):
     def local(self, name, block):
         self._merge_in({'locals': {name: block}})
 
-    def hcl(self, hcl_data):
-        self._merge_in((hcl(hcl_data)))
+    def hcl(self, hcl_string):
+        self.__iadd__(from_hcl(hcl_string))
 
     def __iadd__(self, block):
         if not isinstance(block, (list, tuple)):
@@ -202,4 +202,4 @@ def from_hcl(hcl_string):
                         cls = Data
                     blocks.append(cls(type=type, name=name, body=data[kind][type][name]))
 
-        return blocks
+    return blocks

@@ -81,6 +81,32 @@ def test_hcl():
     assert c1.data == c2.data
 
 
+def test_multiple_hcl():
+    c1 = tf.TFContext()
+    c1 += tf.from_hcl("""
+    terraform {
+      foo = "bar"
+    }
+
+    resource "type" "name" {
+      whatever {
+        here = "there"
+      }
+    }
+
+    """)
+    assert {'terraform': {'foo': 'bar'},
+            'resource': {
+                'type': {
+                    'name': {
+                        'whatever': {
+                            'here': 'there'
+                        }
+                    }
+                }
+            }} == c1.data
+
+
 def test_modify_resource():
     resource = tf.Resource("foo", "bar", {
         "count": 7
