@@ -1,3 +1,4 @@
+import json
 from copy import deepcopy
 from p10s.loads import hcl
 from p10s.utils import merge_dicts
@@ -5,6 +6,12 @@ from p10s.context import BaseContext
 
 
 class TFContext(BaseContext):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.output is None:
+            if self.input is not None:
+                self.output = self.input.with_suffix('.tfjson')
+
     def resource(self, type, name, block=None):
         self += Resource(type, name, block)
 
@@ -41,12 +48,12 @@ class TFContext(BaseContext):
         return self
 
     def __add__(self, block):
-        new = TFContext(self.output)
-        new.data = deepcopy(self.data)
+        new = TFContext(input=self.input, output=self.output, data=deepcopy(self.data))
         return new.__iadd__(block)
 
     def render(self):
-        return self.data
+        with open(self.output, "w") as tfjson:
+            tfjson.write(json.dumps(self.data, indent=4, sort_keys=True))
 
 
 class TerraformBlock():

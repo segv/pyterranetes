@@ -1,23 +1,35 @@
 #!/usr/bin/env python3
 import click
 from pprint import pprint  # noqa: F401
-from conf_obj.engine import Compiler
+from p10s.generator import Generator
 
 
-@click.group()
+class AliasedGroup(click.Group):
+    def get_command(self, ctx, cmd_name):
+        rv = click.Group.get_command(self, ctx, cmd_name)
+        if rv is not None:
+            return rv
+        matches = [x for x in self.list_commands(ctx)
+                   if x.startswith(cmd_name)]
+        if not matches:
+            return None
+        elif len(matches) == 1:
+            return click.Group.get_command(self, ctx, matches[0])
+        ctx.fail('Too many matches: %s' % ', '.join(sorted(matches)))
+
+
+@click.group(cls=AliasedGroup)
 def cli():
     pass
 
 
 @cli.command()
-@click.option('--output',
-              default=None,
-              type=click.Path(exists=False,
-                              allow_dash=True))
 @click.argument('filename', nargs=-1)
-def generate(output, filename):
+def generate(filename):
+    if len(filename) == 0:
+        filename = ['.']
     for f in filename:
-        Compiler(f).compile(output=output)
+        Generator().generate(f)
 
 
 if __name__ == '__main__':

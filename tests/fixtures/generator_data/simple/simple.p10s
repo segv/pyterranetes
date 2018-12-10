@@ -1,0 +1,18 @@
+# -*- python -*-
+from p10s import tf
+
+c = tf.TFContext()
+
+c += tf.HCL("""
+resource "a" "b" {
+  count = 1
+}
+
+resource "a" "c" {
+  count = 2
+}
+
+resource "b" "b" {
+  count = 3
+}
+""")
