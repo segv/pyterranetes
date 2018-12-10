@@ -3,8 +3,6 @@ from pathlib import Path
 from p10s import yaml, json, hcl
 from p10s.loads import _data, load_file
 
-FIXTURES = Path(__file__).parent.parent / 'fixtures'
-
 
 def test_read_yaml_string():
     assert {'foo': True} == yaml("""
@@ -24,27 +22,27 @@ def test_data_from_string():
     assert "./etc/" == _data("./etc/")
 
 
-def test_data_from_path():
-    path = FIXTURES / 'sample.yaml'
+def test_data_from_path(fixtures_dir):
+    path = fixtures_dir / 'sample.yaml'
     expected = open(path).read()
     assert expected == _data(path)
 
 
-def test_data_from_file():
-    path = FIXTURES / 'sample.yaml'
+def test_data_from_file(fixtures_dir):
+    path = fixtures_dir / 'sample.yaml'
     expected = open(path).read()
     assert expected == _data(open(path))
 
 
-def test_read_hcl_filename():
-    assert {'resource': {'a': {'b': {'foo': ['bar']}}}} == hcl(FIXTURES / 'sample.hcl')
+def test_read_hcl_filename(fixtures_dir):
+    assert {'resource': {'a': {'b': {'foo': ['bar']}}}} == hcl(fixtures_dir / 'sample.hcl')
 
 
-def test_load_file():
-    assert {'resource': {'a': {'b': {'foo': ['bar']}}}} == load_file(FIXTURES / 'sample.hcl')
-    assert {'foo': True} == load_file(FIXTURES / 'sample.yaml')
+def test_load_file(fixtures_dir):
+    assert {'resource': {'a': {'b': {'foo': ['bar']}}}} == load_file(fixtures_dir / 'sample.hcl')
+    assert {'foo': True} == load_file(fixtures_dir / 'sample.yaml')
 
 
-def test_load_file_exception():
+def test_load_file_exception(fixtures_dir):
     with pytest.raises(Exception):
-        load_file(FIXTURES / 'sample.txt')
+        load_file(fixtures_dir / 'sample.txt')
