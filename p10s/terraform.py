@@ -5,10 +5,6 @@ from p10s.context import BaseContext
 
 
 class TFContext(BaseContext):
-    def __init__(self, output=None):
-        self.output = output
-        self.data = {}
-
     def resource(self, type, name, block=None):
         self += Resource(type, name, block)
 
