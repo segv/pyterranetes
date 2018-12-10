@@ -114,5 +114,5 @@ class Data(Block2):
 
 
 class HCL(TerraformBlock):
-    def __init__(self, hcl):
-        self.data = pyhcl.loads(hcl)
+    def __init__(self, hcl_string):
+        self.data = hcl(hcl_string)
