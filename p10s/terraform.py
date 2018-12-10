@@ -60,6 +60,9 @@ class TerraformBlock():
     def render(self):
         return self.data
 
+    def body(self):
+        raise NotImplementedError()
+
 
 class Block0(TerraformBlock):
     def __init__(self, block):
@@ -67,18 +70,27 @@ class Block0(TerraformBlock):
             self.KIND: block or {}
         }
 
+    def body(self):
+        return self.data[self.KIND]
+
 
 class Block1(TerraformBlock):
     def __init__(self, arg1, block):
+        self.arg1 = arg1
         self.data = {
             self.KIND: {
                 arg1: block or {}
             }
         }
 
+    def body(self):
+        return self.data[self.KIND][self.arg1]
+
 
 class Block2(TerraformBlock):
     def __init__(self, arg1, arg2, block):
+        self.arg1 = arg1
+        self.arg2 = arg2
         self.data = {
             self.KIND: {
                 arg1: {
@@ -86,6 +98,9 @@ class Block2(TerraformBlock):
                 }
             }
         }
+
+    def body(self):
+        return self.data[self.KIND][self.arg1][self.arg2]
 
 
 class Terraform(Block0):
@@ -107,6 +122,16 @@ class Local(Block1):
 class Module(Block1):
     KIND = 'module'
 
+    @property
+    def name(self):
+        return self.arg1
+
+    @name.setter
+    def name(self, name):
+        self.data[self.KIND][name] = self.data[self.KIND][self.arg1]
+        del self.data[self.KIND][self.arg1]
+        self.arg1 = name
+
 
 class Provider(Block1):
     KIND = 'provider'
@@ -114,6 +139,26 @@ class Provider(Block1):
 
 class Resource(Block2):
     KIND = 'resource'
+
+    @property
+    def type(self):
+        return self.arg1
+
+    @type.setter
+    def type(self, name):
+        self.data[self.KIND][name] = self.data[self.KIND][self.arg1]
+        del self.data[self.KIND][self.arg1]
+        self.arg1 = name
+
+    @property
+    def name(self):
+        return self.arg2
+
+    @name.setter
+    def name(self, name):
+        self.data[self.KIND][self.arg1][name] = self.data[self.KIND][self.arg1][self.arg2]
+        del self.data[self.KIND][self.arg1][self.arg2]
+        self.arg2 = name
 
 
 class Data(Block2):
