@@ -3,4 +3,4 @@ from p10s import tf
 from infra import NAME
 
 c = tf.TFContext()
-c += tf.Provider(NAME, block={})
+c += tf.Provider(NAME, body={})

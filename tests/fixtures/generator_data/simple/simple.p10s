@@ -3,7 +3,7 @@ from p10s import tf
 
 c = tf.TFContext()
 
-c += tf.HCL("""
+c += tf.from_hcl("""
 resource "a" "b" {
   count = 1
 }

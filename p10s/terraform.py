@@ -12,26 +12,26 @@ class TFContext(BaseContext):
             if self.input is not None:
                 self.output = self.input.with_suffix('.tfjson')
 
-    def resource(self, type, name, block=None):
-        self += Resource(type, name, block)
+    def resource(self, type, name, body=None):
+        self += Resource(type, name, body)
 
-    def data(self, type, name, block=None):
-        self += Data(type, name, block)
+    def data(self, type, name, body=None):
+        self += Data(type, name, body)
 
-    def provider(self, name, block=None):
-        self += Provider(name, block)
+    def provider(self, name, body=None):
+        self += Provider(name, body)
 
-    def module(self, name, block=None):
-        self += Module(name, block)
+    def module(self, name, body=None):
+        self += Module(name, body)
 
-    def terraform(self, block=None):
-        self += Terraform(block)
+    def terraform(self, body=None):
+        self += Terraform(body)
 
-    def variable(self, name, block=None):
-        self += Variable(name, block)
+    def variable(self, name, body=None):
+        self += Variable(name, body)
 
-    def output(self, name, block):
-        self += Output(name, block)
+    def output(self, name, body):
+        self += Output(name, body)
 
     def _merge_in(self, values):
         self.data = merge_dicts(self.data, values)
@@ -65,103 +65,103 @@ class TerraformBlock():
 
 
 class Block0(TerraformBlock):
-    def __init__(self, block):
+    def __init__(self, body):
         self.data = {
-            self.KIND: block or {}
+            self.KIND: body or {}
         }
 
     def body(self):
         return self.data[self.KIND]
 
 
-class Block1(TerraformBlock):
-    def __init__(self, arg1, block):
-        self.arg1 = arg1
+class NameBlock(TerraformBlock):
+    def __init__(self, name, body):
+        self._name = name
         self.data = {
             self.KIND: {
-                arg1: block or {}
+                name: body or {}
             }
         }
 
     def body(self):
-        return self.data[self.KIND][self.arg1]
+        return self.data[self.KIND][self.name]
+
+    @property
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self, name):
+        self.data[self.KIND][name] = self.data[self.KIND][self._name]
+        del self.data[self.KIND][self._name]
+        self._name = name
 
 
-class Block2(TerraformBlock):
-    def __init__(self, arg1, arg2, block):
-        self.arg1 = arg1
-        self.arg2 = arg2
+class TypeNameBlock(TerraformBlock):
+    def __init__(self, type, name, body):
+        self._type = type
+        self._name = name
         self.data = {
             self.KIND: {
-                arg1: {
-                    arg2: block or {}
+                type: {
+                    name: body or {}
                 }
             }
         }
 
     def body(self):
-        return self.data[self.KIND][self.arg1][self.arg2]
+        return self.data[self.KIND][self._type][self._name]
+
+    @property
+    def type(self):
+        return self._type
+
+    @type.setter
+    def type(self, name):
+        self.data[self.KIND][name] = self.data[self.KIND][self._type]
+        del self.data[self.KIND][self._type]
+        self._type = name
+
+    @property
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self, name):
+        self.data[self.KIND][self._type][name] = self.data[self.KIND][self._type][self.name]
+        del self.data[self.KIND][self._type][self._name]
+        self._name = name
 
 
 class Terraform(Block0):
     KIND = 'terraform'
 
 
-class Variable(Block1):
+class Variable(NameBlock):
     KIND = 'variable'
 
 
-class Output(Block1):
+class Output(NameBlock):
     KIND = 'output'
 
 
-class Local(Block1):
+class Local(NameBlock):
     KIND = 'local'
 
 
-class Module(Block1):
+class Module(NameBlock):
     KIND = 'module'
 
-    @property
-    def name(self):
-        return self.arg1
 
-    @name.setter
-    def name(self, name):
-        self.data[self.KIND][name] = self.data[self.KIND][self.arg1]
-        del self.data[self.KIND][self.arg1]
-        self.arg1 = name
-
-
-class Provider(Block1):
+class Provider(NameBlock):
     KIND = 'provider'
 
 
-class Resource(Block2):
+class Resource(TypeNameBlock):
     KIND = 'resource'
 
-    @property
-    def type(self):
-        return self.arg1
 
-    @type.setter
-    def type(self, name):
-        self.data[self.KIND][name] = self.data[self.KIND][self.arg1]
-        del self.data[self.KIND][self.arg1]
-        self.arg1 = name
-
-    @property
-    def name(self):
-        return self.arg2
-
-    @name.setter
-    def name(self, name):
-        self.data[self.KIND][self.arg1][name] = self.data[self.KIND][self.arg1][self.arg2]
-        del self.data[self.KIND][self.arg1][self.arg2]
-        self.arg2 = name
-
-
-class Data(Block2):
+class Data(TypeNameBlock):
     KIND = 'data'
 
 
