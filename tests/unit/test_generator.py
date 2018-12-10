@@ -56,3 +56,23 @@ def test_generate(fixtures_dir):
               'c': {'count': 2}},
              'b':
              {'b': {'count': 3}}}} == output_data
+
+
+def test_generate_with_lib1(fixtures_dir):
+    input = fixtures_dir / 'generator_data' / 'with_lib' / 'top.p10s'
+    g = Generator()
+    g.generate(input)
+    output = fixtures_dir / 'generator_data' / 'with_lib' / 'top.tfjson'
+    assert output.exists()
+    output_data = json.load(open(output))
+    assert {'provider': {'whatever': {}}} == output_data
+
+
+def test_generate_with_lib2(fixtures_dir):
+    input = fixtures_dir / 'generator_data' / 'with_lib' / 'sub' / 'bottom.p10s'
+    g = Generator()
+    g.generate(input)
+    output = fixtures_dir / 'generator_data' / 'with_lib' / 'sub' / 'bottom.tfjson'
+    assert output.exists()
+    output_data = json.load(open(output))
+    assert {'provider': {'whatever': {}}} == output_data

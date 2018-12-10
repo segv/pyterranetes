@@ -1,0 +1,3 @@
+generator_data/simple/*.tfjson
+generator_data/with_lib/**/*.tfjson
+
