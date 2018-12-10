@@ -85,13 +85,13 @@ def test_modify_resource():
     resource = tf.Resource("foo", "bar", {
         "count": 7
     })
-    assert resource.body()['count'] == 7
+    assert resource.body['count'] == 7
     assert resource.type == 'foo'
     assert resource.name == 'bar'
-    resource.body()['count'] = 0
+    resource.body['count'] = 0
     resource.name = 'name'
     resource.type = 'type'
-    assert resource.body()['count'] == 0
+    assert resource.body['count'] == 0
     assert resource.name == 'name'
     assert resource.type == 'type'
 
@@ -102,6 +102,6 @@ def test_modify_module():
     })
 
     module.name = "other"
-    module.body()['count'] = 0
+    module.body['count'] = 0
 
     assert {'module': {'other': {'count': 0}}} == module.data
