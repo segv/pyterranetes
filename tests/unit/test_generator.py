@@ -94,3 +94,15 @@ metadata:
     env: prd
 data: {}
 """ == output_data
+
+
+def test_pwd(fixtures_dir):
+    input = fixtures_dir / 'generator_data' / 'simple' / 'pwd.p10s'
+    g = Generator()
+    g.generate(input)
+    output = fixtures_dir / 'generator_data' / 'simple' / 'pwd.tf.json'
+    assert output.exists()
+    output_data = json.load(open(output))
+    assert {'data':
+            {'bar':
+             {'foo': {'__file__': str(input.parent.resolve())}}}} == output_data
