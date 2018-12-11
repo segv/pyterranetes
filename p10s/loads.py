@@ -5,7 +5,8 @@ import json as json_lib
 import io
 
 
-yaml_loader = YAML()
+ruamel = YAML()
+ruamel.default_flow_style = False
 
 
 def _data(object):
@@ -18,7 +19,19 @@ def _data(object):
 
 
 def yaml(input):
-    return yaml_loader.load(_data(input))
+    try:
+        return ruamel.load(_data(input))
+    except Exception as e:
+        print("Error parsing %s" % input)
+        raise(e)
+
+
+def yaml_all(input):
+    try:
+        return ruamel.load_all(_data(input))
+    except Exception as e:
+        print("Error parsing %s" % input)
+        raise(e)
 
 
 def hcl(input):

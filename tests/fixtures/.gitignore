@@ -1,3 +1,4 @@
 generator_data/simple/*.tf.json
+generator_data/simple/*.yaml
 generator_data/with_lib/**/*.tf.json
 

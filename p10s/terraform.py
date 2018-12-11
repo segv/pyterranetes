@@ -6,11 +6,15 @@ from p10s.context import BaseContext
 
 
 class TFContext(BaseContext):
-    def __init__(self, *args, **kwargs):
+    output_file_extension = '.tf.json'
+
+    def __init__(self, *args, data=None, **kwargs):
+        if data is None:
+            self.data = {}
+        else:
+            self.data = data
+
         super().__init__(*args, **kwargs)
-        if self.output is None:
-            if self.input is not None:
-                self.output = self.input.with_suffix('.tf.json')
 
     def resource(self, type, name, body=None):
         self += Resource(type, name, body)

@@ -76,3 +76,21 @@ def test_generate_with_lib2(fixtures_dir):
     assert output.exists()
     output_data = json.load(open(output))
     assert {'provider': {'whatever': {}}} == output_data
+
+
+def test_generate_k8s(fixtures_dir):
+    input = fixtures_dir / 'generator_data' / 'simple' / 'single_k8s.p10s'
+    g = Generator()
+    g.generate(input)
+    output = fixtures_dir / 'generator_data' / 'simple' / 'single_k8s.yaml'
+    assert output.exists()
+    output_data = open(output).read()
+    assert """apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: foobar
+  labels:
+    grafana_dashboard: '1'
+    env: prd
+data: {}
+""" == output_data
