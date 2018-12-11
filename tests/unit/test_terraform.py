@@ -1,3 +1,4 @@
+import pytest
 import p10s.terraform as tf
 
 
@@ -57,9 +58,9 @@ def test_resource():
                                 'list_of_things': [1, 2, 3]}}} == c.data
 
 
-def test_hcl():
+def test_hcl_as_object():
     c1 = tf.Context()
-    c1 += tf.from_hcl("""
+    c1 += tf.many_from_hcl("""
     terraform {
       foo = "bar"
     }
@@ -81,9 +82,36 @@ def test_hcl():
     assert c1.data == c2.data
 
 
-def test_multiple_hcl():
+def test_single_hcl_raises():
+    with pytest.raises(Exception):
+        tf.from_hcl("""
+            terraform {
+              foo = "bar"
+            }
+
+            resource "type" "name" {
+              whatever {
+                here = "there"
+              }
+            }
+        """)
+
+
+def test_single_parse():
     c1 = tf.Context()
-    c1 += tf.from_hcl("""
+    c1 += tf.many_from_hcl("""
+        terraform {
+          foo = "bar"
+        }
+    """)
+    c2 = tf.Context()
+    c2 += tf.Terraform({'foo': 'bar'})
+    assert c1.data == c2.data
+
+
+def test_hcl_as_data():
+    c1 = tf.Context()
+    c1 += tf.many_from_hcl("""
     terraform {
       foo = "bar"
     }

@@ -150,7 +150,7 @@ class Data(TypeNameBlock):
     KIND = 'data'
 
 
-def from_hcl(hcl_string):
+def many_from_hcl(hcl_string):
     data = hcl(hcl_string)
 
     blocks = []
@@ -181,3 +181,13 @@ def from_hcl(hcl_string):
                     blocks.append(cls(type=type, name=name, body=data[kind][type][name]))
 
     return blocks
+
+
+def from_hcl(hcl_string):
+    """Build a single TerraformBlock from raw hcl code."""
+    blocks = many_from_hcl(hcl_string)
+
+    if len(blocks) == 1:
+        return blocks[0]
+    else:
+        raise Exception("Expected exactly one block when using `from_hcl` but got %s blocks from %s" % (len(blocks), hcl_string))
