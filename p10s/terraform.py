@@ -151,6 +151,7 @@ class Data(TypeNameBlock):
 
 
 def many_from_hcl(hcl_string):
+    """Build TerraformBlock objects from raw hcl code. Always returns a list of blocks.1"""
     data = hcl(hcl_string)
 
     blocks = []
