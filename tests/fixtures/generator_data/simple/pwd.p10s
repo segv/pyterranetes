@@ -3,6 +3,6 @@ from p10s import tf
 from pathlib import Path
 import os
 
-c = tf.TFContext()
+c = tf.Context()
 
 c += tf.Data(name="foo", type="bar", body={'__file__': str(Path(os.getcwd()).resolve())})

@@ -38,7 +38,7 @@ kind: Deployment
 
 
 def test_can_not_add_to_context():
-    c = k8s.K8SContext()
+    c = k8s.Context()
     with pytest.raises(Exception):
         c += k8s.Service
 

@@ -4,7 +4,7 @@ from p10s.context import BaseContext
 from p10s.loads import yaml, yaml_all, ruamel
 
 
-class K8SContext(BaseContext):
+class Context(BaseContext):
     output_file_extension = '.yaml'
 
     def __init__(self, *args, data=None, **kwargs):
@@ -28,7 +28,7 @@ class K8SContext(BaseContext):
         return self
 
     def __add__(self, block):
-        new = K8SContext(input=self.input,
+        new = Context(input=self.input,
                          output=self.output,
                          data=deepcopy(self.data))
         return new.__iadd__(block)

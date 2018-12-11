@@ -1,7 +1,7 @@
 # -*- python -*-
 from p10s import tf
 
-c = tf.TFContext()
+c = tf.Context()
 
 c += tf.from_hcl("""
 resource "a" "b" {

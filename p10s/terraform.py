@@ -5,7 +5,7 @@ from p10s.utils import merge_dicts
 from p10s.context import BaseContext
 
 
-class TFContext(BaseContext):
+class Context(BaseContext):
     """Base context for terraform code."""
     output_file_extension = '.tf.json'
 
@@ -29,7 +29,7 @@ class TFContext(BaseContext):
         return self
 
     def __add__(self, block):
-        new = TFContext(input=self.input, output=self.output, data=deepcopy(self.data))
+        new = Context(input=self.input, output=self.output, data=deepcopy(self.data))
         return new.__iadd__(block)
 
     def render(self):

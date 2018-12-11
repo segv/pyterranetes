@@ -2,18 +2,18 @@ import p10s.terraform as tf
 
 
 def test_init():
-    c = tf.TFContext()
+    c = tf.Context()
     assert c.data == {}
 
 
 def test_variable1():
-    c = tf.TFContext()
+    c = tf.Context()
     c += tf.Variable('foo')
     assert {'variable': {'foo': {}}} == c.data
 
 
 def test_variable2():
-    c = tf.TFContext()
+    c = tf.Context()
     c += tf.Variable('foo', dict(
         type='string'
     ))
@@ -21,7 +21,7 @@ def test_variable2():
 
 
 def test_add():
-    a = tf.TFContext()
+    a = tf.Context()
     assert {} == a.data
     b = a + tf.Variable('foo', {'type': 'string'})
     assert {} == a.data
@@ -29,14 +29,14 @@ def test_add():
 
 
 def test_iadd():
-    a = tf.TFContext()
+    a = tf.Context()
     assert {} == a.data
     a += tf.Variable('foo', {'type': 'string'})
     assert {'variable': {'foo': {'type': 'string'}}} == a.data
 
 
 def test_multiple_variables():
-    c = tf.TFContext()
+    c = tf.Context()
     c += tf.Variable('foo', dict(
         type='string'
     ))
@@ -48,7 +48,7 @@ def test_multiple_variables():
 
 
 def test_resource():
-    c = tf.TFContext()
+    c = tf.Context()
     c += tf.Module('foo1', {
         'source': '../../module/',
         'list_of_things': [1, 2, 3]
@@ -58,7 +58,7 @@ def test_resource():
 
 
 def test_hcl():
-    c1 = tf.TFContext()
+    c1 = tf.Context()
     c1 += tf.from_hcl("""
     terraform {
       foo = "bar"
@@ -71,7 +71,7 @@ def test_hcl():
     }
 
     """)
-    c2 = tf.TFContext()
+    c2 = tf.Context()
     c2 += tf.Terraform({'foo': 'bar'})
     c2 += tf.Resource('type', 'name', {
         'whatever': {
@@ -82,7 +82,7 @@ def test_hcl():
 
 
 def test_multiple_hcl():
-    c1 = tf.TFContext()
+    c1 = tf.Context()
     c1 += tf.from_hcl("""
     terraform {
       foo = "bar"

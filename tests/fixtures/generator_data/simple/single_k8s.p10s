@@ -1,7 +1,7 @@
 # -*- python -*-
 from p10s import k8s
 
-c = k8s.K8SContext()
+c = k8s.Context()
 
 c += k8s.from_yaml("""
 apiVersion: v1
