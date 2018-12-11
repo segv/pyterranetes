@@ -6,6 +6,7 @@ from p10s.context import BaseContext
 
 
 class TFContext(BaseContext):
+    """Base context for terraform code."""
     output_file_extension = '.tf.json'
 
     def __init__(self, *args, data=None, **kwargs):
@@ -16,36 +17,9 @@ class TFContext(BaseContext):
 
         super().__init__(*args, **kwargs)
 
-    def resource(self, type, name, body=None):
-        self += Resource(type, name, body)
-
-    def data(self, type, name, body=None):
-        self += Data(type, name, body)
-
-    def provider(self, name, body=None):
-        self += Provider(name, body)
-
-    def module(self, name, body=None):
-        self += Module(name, body)
-
-    def terraform(self, body=None):
-        self += Terraform(body)
-
-    def variable(self, name, body=None):
-        self += Variable(name, body)
-
-    def output(self, name, body):
-        self += Output(name, body)
-
     def _merge_in(self, values):
         self.data = merge_dicts(self.data, values)
         return self
-
-    def local(self, name, block):
-        self._merge_in({'locals': {name: block}})
-
-    def hcl(self, hcl_string):
-        self.__iadd__(from_hcl(hcl_string))
 
     def __iadd__(self, block):
         if not isinstance(block, (list, tuple)):
@@ -86,7 +60,7 @@ class NoArgsBlock(TerraformBlock):
 
 
 class NameBlock(TerraformBlock):
-    def __init__(self, name, body):
+    def __init__(self, name, body=None):
         self._name = name
         self.data = {
             self.KIND: {
@@ -109,7 +83,7 @@ class NameBlock(TerraformBlock):
 
 
 class TypeNameBlock(TerraformBlock):
-    def __init__(self, type, name, body):
+    def __init__(self, type, name, body=None):
         self._type = type
         self._name = name
         self.data = {

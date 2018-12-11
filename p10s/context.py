@@ -8,9 +8,8 @@ class BaseContext():
         else:
             self.input = input
 
-        if output is None:
-            if self.input is not None:
-                self.output = self.input.with_suffix(self.output_file_extension)
+        if output is None and self.input is not None:
+            self.output = self.input.with_suffix(self.output_file_extension)
         else:
             self.output = output
 

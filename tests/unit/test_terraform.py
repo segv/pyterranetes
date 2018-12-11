@@ -8,13 +8,13 @@ def test_init():
 
 def test_variable1():
     c = tf.TFContext()
-    c.variable('foo')
+    c += tf.Variable('foo')
     assert {'variable': {'foo': {}}} == c.data
 
 
 def test_variable2():
     c = tf.TFContext()
-    c.variable('foo', dict(
+    c += tf.Variable('foo', dict(
         type='string'
     ))
     assert {'variable': {'foo': {'type': 'string'}}} == c.data
@@ -37,10 +37,10 @@ def test_iadd():
 
 def test_multiple_variables():
     c = tf.TFContext()
-    c.variable('foo', dict(
+    c += tf.Variable('foo', dict(
         type='string'
     ))
-    c.variable('bar', dict(
+    c += tf.Variable('bar', dict(
         default='whatever'
     ))
     assert {'variable': {'foo': {'type': 'string'},
@@ -49,7 +49,7 @@ def test_multiple_variables():
 
 def test_resource():
     c = tf.TFContext()
-    c.module('foo1', {
+    c += tf.Module('foo1', {
         'source': '../../module/',
         'list_of_things': [1, 2, 3]
     })
@@ -59,7 +59,7 @@ def test_resource():
 
 def test_hcl():
     c1 = tf.TFContext()
-    c1.hcl("""
+    c1 += tf.from_hcl("""
     terraform {
       foo = "bar"
     }
@@ -72,8 +72,8 @@ def test_hcl():
 
     """)
     c2 = tf.TFContext()
-    c2.terraform({'foo': 'bar'})
-    c2.resource('type', 'name', {
+    c2 += tf.Terraform({'foo': 'bar'})
+    c2 += tf.Resource('type', 'name', {
         'whatever': {
             'here': 'there'
         }
