@@ -52,3 +52,22 @@ data: {}
     map.body['data']['foo'] = 'bar'
 
     assert {'data': OrderedDict([('foo', 'bar')]), 'kind': 'ConfigMap'} == map.render()
+
+
+def test_recursive_render():
+    o = k8s.KubernetesObject(data=[
+        [k8s.KubernetesObject(data=4)],
+        {'foo': k8s.KubernetesObject(data='bar')}])
+    assert [[4], {'foo': 'bar'}] == o.render()
+
+
+def test_update1():
+    o = k8s.KubernetesObject(data={'a': 'b'})
+    o.update({'a': {'c': 'd'}})
+    assert {'a': {'c': 'd'}} == o.render()
+
+
+def test_update2():
+    o = k8s.KubernetesObject(data={'a': 'b'})
+    o = o.update({'a': {'c': 'd'}})
+    assert {'a': {'c': 'd'}} == o.render()

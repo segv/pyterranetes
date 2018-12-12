@@ -2,6 +2,7 @@ from copy import deepcopy
 
 from p10s.context import BaseContext
 from p10s.loads import yaml, yaml_all, ruamel
+from p10s.utils import merge_dicts
 
 
 class Context(BaseContext):
@@ -29,8 +30,8 @@ class Context(BaseContext):
 
     def __add__(self, block):
         new = Context(input=self.input,
-                         output=self.output,
-                         data=deepcopy(self.data))
+                      output=self.output,
+                      data=deepcopy(self.data))
         return new.__iadd__(block)
 
     def render(self):
@@ -40,6 +41,8 @@ class Context(BaseContext):
 
 
 class KubernetesObject():
+    KIND = None
+
     def __init__(self, data=None):
         if data is None:
             self.data = {}
@@ -47,14 +50,28 @@ class KubernetesObject():
             self.data = data
 
     def render(self):
-        if 'kind' not in self.data:
+        if (self.KIND is not None) and ('kind' not in self.data):
             self.data['kind'] = self.KIND
-        return self.data
+
+        def _rec(object):
+            if isinstance(object, (list, tuple)):
+                return [_rec(o) for o in object]
+            elif isinstance(object, dict):
+                return {_rec(k): _rec(v) for k, v in object.items()}
+            elif isinstance(object, KubernetesObject):
+                return object.render()
+            else:
+                return object
+
+        return _rec(self.data)
 
     @property
     def body(self):
         return self.data
 
+    def update(self, data):
+        self.data = merge_dicts(self.data, data)
+        return self
 
 class Deployment(KubernetesObject):
     KIND = 'Deployment'
