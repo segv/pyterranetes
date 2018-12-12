@@ -129,6 +129,18 @@ class Variable(NameBlock):
 class Output(NameBlock):
     KIND = 'output'
 
+    def __init__(self, name=None, body=None, **kwargs):
+        if name is None and body is None:
+            keys = list(kwargs.keys())
+            if len(keys) != 1:
+                raise Exception("Output's dwim constructor expects exactly one arg, not %s", kwargs)
+            name = keys[0]
+            body = {
+                'value': kwargs[name]
+            }
+
+        super().__init__(name=name, body=body)
+
 
 class Local(NameBlock):
     KIND = 'local'

@@ -159,3 +159,23 @@ def test_modify_module():
     module.body['count'] = 0
 
     assert {'module': {'other': {'count': 0}}} == module.data
+
+
+def test_output1():
+    o = tf.Output(name='foo')
+    assert o.data == {'output': {'foo': {}}}
+
+
+def test_output2():
+    o = tf.Output(name='foo', body='bar')
+    assert o.data == {'output': {'foo': 'bar'}}
+
+
+def test_output3():
+    o = tf.Output(aws_whatever="${var.other_thing}")
+    assert o.data == {'output': {'aws_whatever': {'value': "${var.other_thing}"}}}
+
+
+def test_output4():
+    with pytest.raises(Exception):
+        tf.Output(a='b', c='d')
