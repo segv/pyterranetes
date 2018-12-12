@@ -22,7 +22,9 @@ VERSION = None
 
 # What packages are required for this module to be executed?
 REQUIRED = [
-    'click', 'ruamel.yaml', 'pyhcl'
+    'Click==7.0',
+    'ruamel.yaml==0.15.81',
+    'pyhcl==0.3.10'
 ]
 
 # What packages are optional?
