@@ -122,6 +122,10 @@ class Terraform(NoArgsBlock):
     KIND = 'terraform'
 
 
+class Locals(NoArgsBlock):
+    KIND = 'locals'
+
+
 class Variable(NameBlock):
     KIND = 'variable'
 
@@ -140,10 +144,6 @@ class Output(NameBlock):
             }
 
         super().__init__(name=name, body=body)
-
-
-class Local(NameBlock):
-    KIND = 'local'
 
 
 class Module(NameBlock):
@@ -178,7 +178,7 @@ def many_from_hcl(hcl_string):
                 if kind == 'output':
                     cls = Output
                 if kind == 'local':
-                    cls = Local
+                    cls = Locals
                 if kind == 'module':
                     cls = Module
                 if kind == 'provider':
