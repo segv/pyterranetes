@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import runpy
 from pathlib import Path
 
 # Note: To use the 'upload' functionality of this file, you must:
@@ -17,7 +16,7 @@ DESCRIPTION = "A toolkit for reducing duplication in terraform and k8s code."
 URL = 'https://github.com/segv/pyterranetes'
 EMAIL = 'marco.baringer@deliveryhero.com'
 AUTHOR = 'Marco Baringer'
-REQUIRES_PYTHON = '>=3.7.0'
+REQUIRES_PYTHON = '>=3.5.0'
 VERSION = None
 
 # What packages are required for this module to be executed?
@@ -33,8 +32,8 @@ EXTRAS = {
 
 here = Path(__file__).parent.resolve()
 
-# load version form __init__ file
-__version__ = open(here / 'VERSION').read()
+# load version from __version__ file
+exec(open("./p10s/__version__.py").read())
 
 
 class UploadCommand(Command):
@@ -95,7 +94,7 @@ setup(
     # },
     install_requires=REQUIRED,
     extras_require=EXTRAS,
-    include_package_data=True,
+    include_package_data=True, # {'static': ['VERSION']},
     license='MIT',
     classifiers=[
         # Trove classifiers

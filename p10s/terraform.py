@@ -33,7 +33,7 @@ class Context(BaseContext):
         return new.__iadd__(block)
 
     def render(self):
-        with open(self.output, "w") as tf_json:
+        with self.output.open("w") as tf_json:
             tf_json.write(json.dumps(self.data, indent=4, sort_keys=True))
 
 

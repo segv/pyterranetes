@@ -24,14 +24,14 @@ def test_data_from_string():
 
 def test_data_from_path(fixtures_dir):
     path = fixtures_dir / 'sample.yaml'
-    expected = open(path).read()
+    expected = path.open().read()
     assert expected == _data(path)
 
 
 def test_data_from_file(fixtures_dir):
     path = fixtures_dir / 'sample.yaml'
-    expected = open(path).read()
-    assert expected == _data(open(path))
+    expected = path.open().read()
+    assert expected == _data(path.open())
 
 
 def test_read_hcl_filename(fixtures_dir):

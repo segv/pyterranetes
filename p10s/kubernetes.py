@@ -35,7 +35,7 @@ class Context(BaseContext):
         return new.__iadd__(block)
 
     def render(self):
-        with open(self.output, "w") as out:
+        with self.output.open("w") as out:
             ruamel.dump_all([data.render() for data in self.data],
                             out)
 
