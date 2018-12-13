@@ -91,23 +91,23 @@ What if we wanted something like this:
 .. code-block:: terraform
 
    resource "aws_security_group" "default" {
-      ...
       ingress {
         from_port = 22
         to_port   = 22
-        cidr_blocks = ['0.0.0.0/0']
+        cidr_blocks = ["0.0.0.0/0"]
       }
       ingress {
         from_port = 443
         to_port   = 443
-        cidr_blocks = ['0.0.0.0/0']
+        cidr_blocks = ["0.0.0.0/0"]
       }
       ingress {
         from_port = 8080
         to_port   = 8080
-        cidr_blocks = ['0.0.0.0/0']
+        cidr_blocks = ["0.0.0.0/0"]
       }
    }
+
 
 We'd like to avoid having to repeat the cidr_blocks and the port
 numbers each time. We can fairly easily convert this to DRY python:
@@ -144,36 +144,44 @@ Reference
 ---------
 
 Terraform Context
-~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^
 
 .. autoclass:: p10s.terraform.Context
    :members:
 
 Terraform Objects
-~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^
 
 .. autofunction:: p10s.terraform.from_hcl
 .. autoclass:: p10s.terraform.Terraform
 .. autoclass:: p10s.terraform.Variable
 .. autoclass:: p10s.terraform.Output
-.. autoclass:: p10s.terraform.Local
+.. autoclass:: p10s.terraform.Locals
 .. autoclass:: p10s.terraform.Module
 .. autoclass:: p10s.terraform.Provider
 .. autoclass:: p10s.terraform.Resource
 .. autoclass:: p10s.terraform.Data
 
+Terraform Helpers
+^^^^^^^^^^^^^^^^^
+
+.. autofunction:: p10s.terraform.from_hcl
+.. autofunction:: p10s.terraform.many_from_hcl
                   
 Kubernetes
 ==========
 
+Reference
+---------
+
 Kubernetes Context
-~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^
 
 .. autoclass:: p10s.kubernetes.Context
    :members:
 
-Terraform Objects
-~~~~~~~~~~~~~~~~~
+Kubernetes Objects
+^^^^^^^^^^^^^^^^^^
 
 .. autoclass:: p10s.kubernetes.Deployment
 .. autoclass:: p10s.kubernetes.ConfigMap
@@ -181,6 +189,10 @@ Terraform Objects
 .. autofunction:: p10s.kubernetes.from_yaml
 .. autofunction:: p10s.kubernetes.many_from_yaml
 
+Kubernetes Helpers
+^^^^^^^^^^^^^^^^^^
+.. autofunction:: p10s.kubernetes.from_yaml
+.. autofunction:: p10s.kubernetes.many_from_yaml
       
 Indices and tables
 ==================
