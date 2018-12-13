@@ -1,0 +1,11 @@
+# -*- yaml -*-
+
+image: python:3.7-stretch
+
+before_script:
+  - pip3 install -r requirements_dev.txt
+  
+test:
+  script:
+    - pip3 install -e .
+    - ./tests/run-tests

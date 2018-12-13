@@ -1,0 +1,10 @@
+#!/bin/bash
+set -euo pipefail
+
+HERE=$(dirname $BASH_SOURCE[0])
+
+export PYTHONPATH=$(readlink -f ${HERE}/../)
+
+pytest -vvv -s --lf ${HERE}
+
+
