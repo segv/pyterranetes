@@ -5,7 +5,7 @@ import json as json_lib
 import io
 
 
-ruamel = YAML()
+ruamel = YAML(typ='safe', pure=True)
 ruamel.default_flow_style = False
 
 
@@ -13,7 +13,7 @@ def _data(object):
     if isinstance(object, (io.BufferedIOBase, io.TextIOBase, io.RawIOBase, io.IOBase)):
         return object.read()
     elif isinstance(object, Path):
-        return open(object).read()
+        return object.open().read()
     else:
         return object
 

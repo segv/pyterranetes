@@ -49,7 +49,7 @@ def test_generate(fixtures_dir):
     g.generate(input)
     output = fixtures_dir / 'generator_data' / 'simple' / 'simple.tf.json'
     assert output.exists()
-    output_data = json.load(open(output))
+    output_data = json.load(output.open())
     assert {'resource':
             {'a':
              {'b': {'count': 1},
@@ -64,7 +64,7 @@ def test_generate_with_lib1(fixtures_dir):
     g.generate(input)
     output = fixtures_dir / 'generator_data' / 'with_lib' / 'top.tf.json'
     assert output.exists()
-    output_data = json.load(open(output))
+    output_data = json.load(output.open())
     assert {'provider': {'whatever': {}}} == output_data
 
 
@@ -74,7 +74,7 @@ def test_generate_with_lib2(fixtures_dir):
     g.generate(input)
     output = fixtures_dir / 'generator_data' / 'with_lib' / 'sub' / 'bottom.tf.json'
     assert output.exists()
-    output_data = json.load(open(output))
+    output_data = json.load(output.open())
     assert {'provider': {'whatever': {}}} == output_data
 
 
@@ -84,15 +84,15 @@ def test_generate_k8s(fixtures_dir):
     g.generate(input)
     output = fixtures_dir / 'generator_data' / 'simple' / 'single_k8s.yaml'
     assert output.exists()
-    output_data = open(output).read()
+    output_data = output.open().read()
     assert """apiVersion: v1
+data: {}
 kind: ConfigMap
 metadata:
-  name: foobar
   labels:
-    grafana_dashboard: '1'
     env: prd
-data: {}
+    grafana_dashboard: '1'
+  name: foobar
 """ == output_data
 
 
@@ -102,7 +102,7 @@ def test_pwd(fixtures_dir):
     g.generate(input)
     output = fixtures_dir / 'generator_data' / 'simple' / 'pwd.tf.json'
     assert output.exists()
-    output_data = json.load(open(output))
+    output_data = json.load(output.open())
     assert {'data':
             {'bar':
              {'foo': {'__file__': str(input.parent.resolve())}}}} == output_data

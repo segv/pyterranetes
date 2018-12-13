@@ -46,8 +46,8 @@ class Generator():
         for path in self.p10s_files(root):
             with values({'p10s': {'file': path}}):
                 pwd = os.getcwd()
-                os.chdir(path.parent)
-                globals = runpy.run_path(path)
+                os.chdir(str(path.parent))
+                globals = runpy.run_path(str(path))
                 os.chdir(pwd)
                 for value in globals.values():
                     if isinstance(value, BaseContext):

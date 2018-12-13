@@ -1,11 +1,24 @@
 # -*- yaml -*-
 
-image: python:3.7-stretch
-
 before_script:
-  - pip3 install -r requirements_dev.txt
-  
-test:
+  - pip install -r requirements_dev.txt
+
+stages: [ test ]
+
+test35:
+  stage: test
+  image: python:3.5
   script:
-    - pip3 install -e .
-    - ./tests/run-tests
+    - tox -e py35
+
+test36:
+  stage: test
+  image: python:3.6
+  script:
+    - tox -e py36
+
+test37:
+  stage: test
+  image: python:3.7
+  script:
+    - tox -e py37
