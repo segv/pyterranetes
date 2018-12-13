@@ -3,22 +3,32 @@
 before_script:
   - pip install -r requirements_dev.txt
 
-stages: [ test ]
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
+stages: [ test, deploy ]
 
 test35:
   stage: test
   image: python:3.5
-  script:
-    - tox -e py35
+  script: [ tox -e py35 ]
 
 test36:
   stage: test
   image: python:3.6
-  script:
-    - tox -e py36
+  script: [ tox -e py36 ]
 
 test37:
   stage: test
   image: python:3.7
+  script: [ tox -e py37 ]
+
+pages:
+  image: python:3.7
+  stage: deploy
   script:
-    - tox -e py37
+    - pip3 install --upgrade --force-reinstall -e .
+    - sphinx-build -W ./docs ./public
+  artifacts:
+    paths: [ ./public ]
+  only: [ master ]
