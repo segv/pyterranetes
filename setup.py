@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from pathlib import Path
 
 # Note: To use the 'upload' functionality of this file, you must:
 #   $ pip install twine
@@ -30,10 +29,10 @@ REQUIRED = [
 EXTRAS = {
 }
 
-here = Path(__file__).parent.resolve()
+here = os.path.dirname(__file__)
 
 # load version from __version__ file
-exec(open("./p10s/__version__.py").read())
+exec(open(os.path.join(here, "./p10s/__version__.py")).read())
 
 
 class UploadCommand(Command):
