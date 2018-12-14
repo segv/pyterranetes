@@ -85,7 +85,7 @@ setup(
     python_requires=REQUIRES_PYTHON,
     url=URL,
     packages=find_packages(exclude=('tests',)),
-    scripts=['bin/p10s', 'bin/p10s-g'],
+    scripts=['bin/p10s'],
     # If your package is a single module, use this instead of 'packages':
     # py_modules=['mypackage'],
 
