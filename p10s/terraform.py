@@ -221,9 +221,10 @@ class NameBlock(TerraformBlock):
 
     @name.setter
     def name(self, name):
-        self.data[self.KIND][name] = self.data[self.KIND][self._name]
-        del self.data[self.KIND][self._name]
-        self._name = name
+        if name != self._name:
+            self.data[self.KIND][name] = self.data[self.KIND][self._name]
+            del self.data[self.KIND][self._name]
+            self._name = name
 
 
 class TypeNameBlock(TerraformBlock):

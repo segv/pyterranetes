@@ -7,5 +7,6 @@ export PYTHONPATH=${PROJECT_ROOT}
 
 pip install -U -e ${PROJECT_ROOT}
 
-pytest -vvv -s --lf ${PROJECT_ROOT}/tests/
+pytest -vvv -s --lf ${PROJECT_ROOT}/tests/ "$@"
+
 
