@@ -1,3 +1,60 @@
+"""Very similar to how things are done with terraform configs, we create
+a context and add kubernetes objects to it:
+
+.. code-block:: python
+
+    from p10s import k8s, value
+
+    c = k8s.Context()
+
+    deployment = k8s.Deployment(yaml(\"""
+        apiVersion: apps/v1
+        kind: Deployment
+        metadata:
+          name: nginx-deployment
+          labels:
+            app: nginx
+        spec:
+    \"""))
+
+    deployment.body['metadata']['labels']['env'] = value('ENV')
+
+    c += deployment
+
+    c += k8s.Service(yaml(\"""
+        kind: Service
+        apiVersion: v1
+        metadata:
+          name: my-service
+        spec:
+            ...
+    \"""))
+
+    ...
+
+
+While you can always pass in a dict object to the various
+KubernetesObject class constructors it's usually easier, and closer to
+what you already know, to use the ``yaml`` helper to parse a bock of
+yaml code and start working with that. you can use the
+:py:meth:`apiVersion <p10s.kubernetes.KubernetesObject.apiVersion>`,
+:py:meth:`metadata <p10s.kubernetes.KubernetesObject.metadata>`, and
+:py:meth:`spec <p10s.kubernetes.KubernetesObject.spec>` properties no
+matter how the object was created.
+
+The various KubernetesObject clsses exist only for readability and
+convenience, creating a base KubernetesObject and passing in ``kind``
+is the fully equivalent. This is also the way to create ojects for
+kinds that are not pre-defined.
+
+p10s takes advantage of the fact that you can have multiple kubernetes
+objects in the same yaml file (represented as multiple kubernetes
+documents). Multiple ``KubernetesObject`` objects can be added to the
+same ``k8s.Context``, in the same p10s script, and kubernetes and helm
+will be able to properly parse it.
+
+"""
+
 from copy import deepcopy
 
 from p10s.context import BaseContext
@@ -6,6 +63,10 @@ from p10s.utils import merge_dicts
 
 
 class Context(BaseContext):
+    """Context class for generating kubernetes and helm files.
+
+Really is just a YAML context.
+"""
     output_file_extension = '.yaml'
 
     def __init__(self, *args, data=None, **kwargs):
@@ -16,7 +77,7 @@ class Context(BaseContext):
 
         super().__init__(*args, **kwargs)
 
-    def __iadd__(self, object):
+    def add(self, object):
         if not isinstance(object, (list, tuple)):
             objects = [object]
         else:
@@ -28,11 +89,14 @@ class Context(BaseContext):
                 raise Exception("Can't add %s to %s, is not of type KubernetesObject", o, self)
         return self
 
+    def __iadd__(self, object):
+        return self.add(object)
+
     def __add__(self, block):
         new = Context(input=self.input,
                       output=self.output,
                       data=deepcopy(self.data))
-        return new.__iadd__(block)
+        return new.add(block)
 
     def render(self):
         with self.output.open("w") as out:
@@ -43,16 +107,18 @@ class Context(BaseContext):
 class KubernetesObject():
     KIND = None
 
-    def __init__(self, data=None):
+    def __init__(self, data=None, kind=None):
         if data is None:
             self.data = {}
         else:
             self.data = data
 
-    def render(self):
-        if (self.KIND is not None) and ('kind' not in self.data):
-            self.data['kind'] = self.KIND
+        if kind is not None:
+            self.kind = kind
+        elif self.KIND is not None:
+            self.kind = self.KIND
 
+    def render(self):
         def _rec(object):
             if isinstance(object, (list, tuple)):
                 return [_rec(o) for o in object]
@@ -73,6 +139,43 @@ class KubernetesObject():
         self.data = merge_dicts(self.data, data)
         return self
 
+    @property
+    def kind(self):
+        """Property mapping this object's ``kind`` value"""
+        return self.data.get('kind', None)
+
+    @kind.setter
+    def kind(self, value):
+        self.data['kind'] = value
+
+    @property
+    def apiVersion(self):
+        """Property mapping this object's ``apiVersion`` value"""
+        return self.data.get('apiVersion', None)
+
+    @apiVersion.setter
+    def apiVersion(self, value):
+        self.data['apiVersion'] = value
+
+    @property
+    def metadata(self):
+        """Property mapping this object's ``metadata`` value"""
+        return self.data.get('metadata', None)
+
+    @metadata.setter
+    def metadata(self, value):
+        self.data['metadata'] = value
+
+    @property
+    def spec(self):
+        """Property mapping this object's ``spec`` value"""
+        return self.data.get('spec', None)
+
+    @spec.setter
+    def spec(self, value):
+        self.data['spec'] = value
+
+
 class Deployment(KubernetesObject):
     KIND = 'Deployment'
 
@@ -83,6 +186,22 @@ class ConfigMap(KubernetesObject):
 
 class Service(KubernetesObject):
     KIND = 'Service'
+
+
+class Job(KubernetesObject):
+    KIND = 'Job'
+
+
+class StatefulSet(KubernetesObject):
+    KIND = 'StatefulSet'
+
+
+class Ingress(KubernetesObject):
+    KIND = 'Ingress'
+
+
+class Secret(KubernetesObject):
+    KIND = 'Ingress'
 
 
 def _data_to_object(data):

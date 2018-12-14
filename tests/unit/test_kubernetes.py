@@ -71,3 +71,30 @@ def test_update2():
     o = k8s.KubernetesObject(data={'a': 'b'})
     o = o.update({'a': {'c': 'd'}})
     assert {'a': {'c': 'd'}} == o.render()
+
+
+def test_properties1():
+    o = k8s.Deployment()
+    o.apiVersion = 'v1'
+    o.metadata = {
+        'name': 'foobar'
+    }
+    o.spec = True
+    assert {'apiVersion': 'v1',
+            'kind': 'Deployment',
+            'metadata': {
+                'name': 'foobar'},
+            'spec': True} == o.render()
+
+
+def test_properties2():
+    o = k8s.Deployment(data={
+        'apiVersion': 'v1',
+        'kind': 'Deployment',
+        'metadata': {
+            'name': 'foobar'},
+        'spec': True
+    })
+    assert o.apiVersion == 'v1'
+    assert o.metadata == {'name': 'foobar'}
+    assert o.spec == True

@@ -35,3 +35,28 @@ def test_value_inheritence2():
         assert _inner() == 'inner'
         with values(foo='bottom'):
             assert _inner() == 'bottom'
+
+
+def test_values_as_dict1():
+    v = Values()
+    v['a'] = 'b'
+    assert {'a': 'b'} == v.values
+
+
+def test_values_as_dict2():
+    v = Values()
+    v['a'] = 'b'
+    del v['a']
+    assert v.values == {}
+
+
+def test_values_as_dict3():
+    v = Values()
+    v['a'] = 'b'
+    assert v.get('b', False) is False
+
+
+def test_values_as_dict4():
+    v = Values()
+    v['a'] = 'b'
+    assert len(v) == len(v.values)

@@ -8,17 +8,17 @@ variables:
 
 stages: [ test, deploy ]
 
-test35:
+test:3.5:
   stage: test
   image: python:3.5
   script: [ tox -e py35 ]
 
-test36:
+test:3.6:
   stage: test
   image: python:3.6
   script: [ tox -e py36 ]
 
-test37:
+test:3.7:
   stage: test
   image: python:3.7
   script: [ tox -e py37 ]

@@ -1,0 +1,11 @@
+#!/bin/bash
+set -euo pipefail
+
+PROJECT_ROOT=$(readlink -f $(dirname $BASH_SOURCE[0])/../)
+
+export PYTHONPATH=${PROJECT_ROOT}
+
+pip install -U -e ${PROJECT_ROOT}
+
+pytest -vvv -s --lf ${PROJECT_ROOT}/tests/
+
