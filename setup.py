@@ -31,6 +31,7 @@ EXTRAS = {
 
 here = os.path.dirname(__file__)
 
+__version__ = 'A.B.C'
 # load version from __version__ file
 exec(open(os.path.join(here, "./p10s/__version__.py")).read())
 
@@ -93,7 +94,7 @@ setup(
     # },
     install_requires=REQUIRED,
     extras_require=EXTRAS,
-    include_package_data=True, # {'static': ['VERSION']},
+    include_package_data=True,
     license='MIT',
     classifiers=[
         # Trove classifiers

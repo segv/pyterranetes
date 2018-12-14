@@ -48,7 +48,7 @@ def test_multiple_variables():
                          'bar': {'default': 'whatever'}}} == c.data
 
 
-def test_resource():
+def test_module():
     c = tf.Context()
     c += tf.Module('foo1', {
         'source': '../../module/',
@@ -56,6 +56,14 @@ def test_resource():
     })
     assert {'module': {'foo1': {'source': '../../module/',
                                 'list_of_things': [1, 2, 3]}}} == c.data
+
+
+def test_resource():
+    c = tf.Context()
+    c += tf.Resource("type", "name", dict(
+        var='value'
+    ))
+    assert {'resource': {'type': {'name': {'var': 'value'}}}} == c.data
 
 
 def test_hcl_as_object():
@@ -159,6 +167,29 @@ def test_modify_module():
     module.body['count'] = 0
 
     assert {'module': {'other': {'count': 0}}} == module.data
+
+
+def test_share_resource():
+    t = tf.Variable("var1", dict(default=1))
+    c = tf.Context()
+
+    c += t
+    t.name = 'var2'
+    c += t
+
+    assert c.data == {'variable': {'var2': {'default': 1}}}
+
+
+def test_copy_resource():
+    t = tf.Variable("var1", dict(default=1))
+    c = tf.Context()
+
+    c += t.copy()
+    t.name = 'var2'
+    c += t
+
+    assert c.data == {'variable': {'var1': {'default': 1},
+                                   'var2': {'default': 1}}}
 
 
 def test_output1():
