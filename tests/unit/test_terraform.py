@@ -210,3 +210,9 @@ def test_output3():
 def test_output4():
     with pytest.raises(Exception):
         tf.Output(a='b', c='d')
+
+
+def test_module_name():
+    m = tf.from_hcl("""module "X" { var = "value" }""")
+    m.name = "X"
+    assert {'module': {'X': {'var': 'value'}}} == m.data
