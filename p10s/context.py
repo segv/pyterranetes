@@ -15,3 +15,7 @@ class BaseContext():
 
     def render(self):
         raise NotImplementedError()
+
+    def _output_stream(self):
+        self.output.parent.mkdir(parents=True, exist_ok=True)
+        return self.output.open("w")
