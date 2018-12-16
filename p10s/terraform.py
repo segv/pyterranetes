@@ -63,11 +63,15 @@ would generate the following hcl:
 There are 3 different categories of terraform blocks:
 
 Blocks that don't have any properties other than ``.body``:
-    :py:class:`terraform <p10s.terraform.Terraform>`, and :py:class:`locals <p10s.terraform.Locals>`.
+    :py:class:`terraform <p10s.terraform.Terraform>`, and
+    :py:class:`locals <p10s.terraform.Locals>`.
 Blocks that also have a name property:
-    :py:class:`provider <p10s.terraform.Provider>`, :py:class:`variable <p10s.terraform.Variable>`, and :py:class:`output <p10s.terraform.Output>`
+    :py:class:`provider <p10s.terraform.Provider>`,
+    :py:class:`variable <p10s.terraform.Variable>`, and
+    :py:class:`output <p10s.terraform.Output>`
 Blocks that also have a type and a name property:
-    :py:class:`resource <p10s.terraform.Resource>`, and  :py:class:`data <p10s.terraform.Data>`
+    :py:class:`resource <p10s.terraform.Resource>`, and
+    :py:class:`data <p10s.terraform.Data>`
 
 Sometimes it's more convenient to start with hcl code, we can use the
 :py:func:`from_hcl <p10s.terraform.from_hcl>` function:
