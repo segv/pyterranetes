@@ -109,6 +109,7 @@ from copy import deepcopy
 from p10s.loads import hcl
 from p10s.utils import merge_dicts
 from p10s.context import BaseContext
+from pprint import pformat
 
 
 class Context(BaseContext):
@@ -336,10 +337,21 @@ class Data(TypeNameBlock):
     KIND = 'data'
 
 
-def many_from_hcl(hcl_string):
+class HCLParseException(Exception):
+    def __init__(self, data):
+        self.data = data
 
+    def __str__(self):
+        return "Unable to parse HCL text %s" % pformat(self.data)
+
+
+def many_from_hcl(hcl_string):
     """Build TerraformBlock objects from hcl text. Always returns a list of blocks."""
-    data = hcl(hcl_string)
+
+    try:
+        data = hcl(hcl_string)
+    except Exception as e:
+        raise HCLParseException(data=hcl_string) from e
 
     blocks = []
 

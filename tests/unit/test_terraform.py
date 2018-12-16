@@ -105,6 +105,25 @@ def test_single_hcl_raises():
         """)
 
 
+def test_many_from_hcl_no_data():
+    with pytest.raises(tf.HCLParseException):
+        tf.many_from_hcl(""" """)
+
+
+def test_from_hcl_no_data():
+    with pytest.raises(tf.HCLParseException):
+        tf.from_hcl(""" """)
+
+
+def test_from_hcl_no_data2():
+    try:
+        tf.from_hcl(""" """)
+    except tf.HCLParseException as e:
+        assert str(e).startswith("Unable to parse")
+    else:
+        pytest.fail("from_hcl did not raise an exception")
+
+
 def test_single_parse():
     c1 = tf.Context()
     c1 += tf.many_from_hcl("""
