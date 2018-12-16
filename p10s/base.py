@@ -1,4 +1,5 @@
 from p10s.values import value
+from p10s.utils import merge_dicts
 
 
 class BaseContext():

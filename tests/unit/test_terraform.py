@@ -67,6 +67,17 @@ def test_resource():
     assert {'resource': {'type': {'name': {'var': 'value'}}}} == c.data
 
 
+def test_update1():
+    r = tf.Resource(type="t", name="n", body=dict(
+    ))
+    r.update(dict(
+        type="other",
+        name="nother"
+    ))
+
+    assert {'resource': {'t': {'n': {'type': 'other', 'name': 'nother'}}}} == r.data
+
+
 def test_hcl_as_object():
     c1 = tf.Context()
     c1 += tf.many_from_hcl("""
