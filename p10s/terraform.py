@@ -112,7 +112,7 @@ import json
 from copy import deepcopy
 from p10s.loads import hcl
 from p10s.utils import merge_dicts
-from p10s.context import BaseContext
+from p10s.base import BaseContext
 from pprint import pformat
 
 
@@ -187,6 +187,10 @@ property for direct manipulation of the block's data.
 other non-body values are exposed as properties on the corresponding
 object."""
         return self._body()
+
+    def update(self, new_body_values):
+        merge_dicts(self.body, new_body_values)
+        return self
 
     def _body(self):
         raise NotImplementedError()

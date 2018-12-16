@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 import runpy
 
-from p10s.context import BaseContext
+from p10s.base import BaseContext
 from p10s.values import values
 
 

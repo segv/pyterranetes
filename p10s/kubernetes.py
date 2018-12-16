@@ -57,7 +57,7 @@ will be able to properly parse it.
 
 from copy import deepcopy
 
-from p10s.context import BaseContext
+from p10s.base import BaseContext
 from p10s.loads import yaml, yaml_all, ruamel
 from p10s.utils import merge_dicts
 
@@ -135,8 +135,8 @@ class KubernetesObject():
     def body(self):
         return self.data
 
-    def update(self, data):
-        self.data = merge_dicts(self.data, data)
+    def update(self, new_body_values):
+        self.data = merge_dicts(self.data, new_body_values)
         return self
 
     @property
