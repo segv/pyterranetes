@@ -1,5 +1,6 @@
 import pytest
 import p10s.terraform as tf
+import shutil
 
 
 def test_init():
@@ -216,3 +217,14 @@ def test_module_name():
     m = tf.from_hcl("""module "X" { var = "value" }""")
     m.name = "X"
     assert {'module': {'X': {'var': 'value'}}} == m.data
+
+
+def test_create_output_dir(fixtures_dir):
+    output_dir = fixtures_dir / 'generator_data' / 'simple' / 'does_not_exist'
+    output_file = output_dir / 'output.tf.json'
+    shutil.rmtree(str(output_dir), ignore_errors=True)
+    c = tf.Context(output=output_file)
+    c += tf.Terraform(dict(foo=42))
+    c.render()
+
+    assert output_file.exists()

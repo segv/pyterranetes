@@ -1,6 +1,7 @@
 import pytest
 from p10s import k8s
 from collections import OrderedDict
+import shutil
 
 
 def test_service1():
@@ -98,3 +99,14 @@ def test_properties2():
     assert o.apiVersion == 'v1'
     assert o.metadata == {'name': 'foobar'}
     assert o.spec == True
+
+
+def test_create_output_dir(fixtures_dir):
+    output_dir = fixtures_dir / 'generator_data' / 'simple' / 'does_not_exist'
+    output_file = output_dir / 'output.yaml'
+    shutil.rmtree(str(output_dir), ignore_errors=True)
+    c = k8s.Context(output=output_file)
+    c += k8s.Service(dict(foo=42))
+    c.render()
+
+    assert output_file.exists()

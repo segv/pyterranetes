@@ -99,7 +99,7 @@ Really is just a YAML context.
         return new.add(block)
 
     def render(self):
-        with self.output.open("w") as out:
+        with self._output_stream() as out:
             ruamel.dump_all([data.render() for data in self.data],
                             out)
 

@@ -158,7 +158,7 @@ single terraform file. Block of terraform can be added using the
         return self.copy().add(block)
 
     def render(self):
-        with self.output.open("w") as tf_json:
+        with self._output_stream() as tf_json:
             tf_json.write(json.dumps(self.data, indent=4, sort_keys=True))
 
 
