@@ -1,5 +1,5 @@
 from p10s.values import value
-from p10s.utils import merge_dicts
+from pathlib import Path
 
 
 class BaseContext():
@@ -7,12 +7,14 @@ class BaseContext():
         if input is None:
             self.input = value('p10s', {}).get('file', None)
         else:
-            self.input = input
+            self.input = Path(input)
 
-        if output is None and self.input is not None:
+        if output is not None:
+            self.output = Path(output)
+        elif self.input is not None:
             self.output = self.input.with_suffix(self.output_file_extension)
         else:
-            self.output = output
+            self.output = None
 
     def render(self):
         raise NotImplementedError()
