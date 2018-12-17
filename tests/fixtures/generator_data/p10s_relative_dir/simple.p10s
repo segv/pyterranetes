@@ -1,0 +1,10 @@
+# -*- python -*-
+from p10s import tf
+
+c = tf.Context(output="./out/simple.tf.json")
+
+c += tf.from_hcl("""
+resource "a" "b" {
+  count = 1
+}
+""")

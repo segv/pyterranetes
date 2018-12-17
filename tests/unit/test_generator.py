@@ -32,7 +32,7 @@ def test_compute_output_file(fixtures_dir):
     g = Generator()
     outputs = g.compile(input)
     assert len(outputs) == 1
-    output = outputs[0]
+    output = outputs[0].contexts[0]
     assert output.input == input
     assert output.output == input.with_suffix('.tf.json')
     assert {'resource':
