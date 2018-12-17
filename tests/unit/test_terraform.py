@@ -258,3 +258,22 @@ def test_create_output_dir(fixtures_dir):
     c.render()
 
     assert output_file.exists()
+
+
+def test_variables():
+    c = tf.Context()
+    c += tf.variables(
+        foo=42,
+        bar='whatever'
+    )
+    assert {'variable': {'foo': {'default': 42},
+                         'bar': {'default': 'whatever'}}} == c.data
+
+
+def test_outputs():
+    c = tf.Context()
+    c += tf.outputs(
+        a='b',
+        c='${var.c}')
+    assert {'output': {'a': {'value': 'b'},
+                       'c': {'value': '${var.c}'}}} == c.data

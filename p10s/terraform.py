@@ -287,6 +287,10 @@ class Variable(NameBlock):
     KIND = 'variable'
 
 
+def variables(**kwargs):
+    return [Variable(name=name, body={'default': kwargs[name]}) for name in kwargs.keys()]
+
+
 class Output(NameBlock):
     """``output`` block. Exposes `.name` as a property.
 
@@ -323,6 +327,10 @@ and, of course, simpler construction works as well:
             }
 
         super().__init__(name=name, body=body)
+
+
+def outputs(**kwargs):
+    return [Output(name=name, body={'value': kwargs[name]}) for name in kwargs.keys()]
 
 
 class Module(NameBlock):
