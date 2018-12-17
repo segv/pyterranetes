@@ -288,6 +288,25 @@ class Variable(NameBlock):
 
 
 def variables(**kwargs):
+    """Helper function for defining multiple variable blocks which only specify their default value.
+
+Example:
+
+.. code-block:: python
+
+  c += tf.variables(
+      name='value,
+      other='other value')
+
+is short hand for:
+
+.. code-block:: python
+
+  c += tf.Variable("name", {'default': 'value'})
+  c += tf.Variable("other", {'default': 'other value'})
+
+
+"""
     return [Variable(name=name, body={'default': kwargs[name]}) for name in kwargs.keys()]
 
 
@@ -330,6 +349,25 @@ and, of course, simpler construction works as well:
 
 
 def outputs(**kwargs):
+    """Helper function for defining multiple output blocks.
+
+Example:
+
+.. code-block:: python
+
+  c += tf.output(
+      name='${module.foo.id},
+      other='${module.foo.key}')
+
+is short hand for:
+
+.. code-block:: python
+
+  c += tf.Output("name", {'value': '${module.foo.id}'})
+  c += tf.Output("other", {'value': '${module.foo.key}'})
+
+
+"""
     return [Output(name=name, body={'value': kwargs[name]}) for name in kwargs.keys()]
 
 

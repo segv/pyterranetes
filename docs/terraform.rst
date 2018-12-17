@@ -21,6 +21,8 @@ Blocks
 Helpers
 -------
 
+.. autofunction:: p10s.terraform.variables
+.. autofunction:: p10s.terraform.outputs
 .. autofunction:: p10s.terraform.from_hcl
 .. autofunction:: p10s.terraform.many_from_hcl
 
