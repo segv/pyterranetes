@@ -136,6 +136,7 @@ class KubernetesObject():
         return self.data
 
     def update(self, new_body_values):
+        """Merges in ``new_body_values`` with this block's body."""
         self.data = merge_dicts(self.data, new_body_values)
         return self
 
