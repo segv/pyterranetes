@@ -189,6 +189,8 @@ object."""
         return self._body()
 
     def update(self, new_body_values):
+        """Merges in ``new_body_values`` with this block's body. Does not
+change ``name`` or ``type`` or any of the block's properties."""
         merge_dicts(self.body, new_body_values)
         return self
 
