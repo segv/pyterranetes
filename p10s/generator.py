@@ -7,6 +7,21 @@ from p10s.base import BaseContext
 from p10s.values import values
 
 
+class Output():
+    def __init__(self, basedir):
+        self.basedir = basedir
+        self.contexts = []
+
+    def render(self):
+        pwd = os.getcwd()
+        os.chdir(str(self.basedir))
+        try:
+            for c in self.contexts:
+                c.render()
+        finally:
+            os.chdir(pwd)
+
+
 class Generator():
     def add_pyterranetes_dir(self, root):
         here = root
@@ -45,13 +60,16 @@ class Generator():
         outputs = []
         for path in self.p10s_files(root):
             with values({'p10s': {'file': path}}):
+                output = Output(basedir=path.parent.resolve())
                 pwd = os.getcwd()
                 os.chdir(str(path.parent))
                 globals = runpy.run_path(str(path))
                 os.chdir(pwd)
                 for value in globals.values():
                     if isinstance(value, BaseContext):
-                        outputs.append(value)
+                        output.contexts.append(value)
+                outputs.append(output)
+
         return outputs
 
     def generate(self, root):
