@@ -24,17 +24,42 @@ def _set_foo():
 
 
 def test_value_inheritence1():
-    with values(foo='top'):
+    with values({'bar': 'top'}, foo='top'):
         with values(foo='bottom'):
             assert _inner() == 'bottom'
 
 
 def test_value_inheritence2():
-    with values(foo='top'):
+    with values(foo='top', bar='top'):
         _set_foo()
         assert _inner() == 'inner'
         with values(foo='bottom'):
             assert _inner() == 'bottom'
+
+
+def test_value_inheritence3():
+    with values(foo='top', bar='top'):
+        with values(foo='bottom'):
+            assert value('bar') == 'top'
+            assert value('foo') == 'bottom'
+
+
+def test_value_values_args1():
+    with values({'a': 'top_first'}, {'a': 'top_second'}, a='top_third'):
+        assert value('a') == 'top_third'
+
+
+def test_value_values_args2():
+    with values({'a': 'top_A'}, {'b': 'top_B'}):
+        with values(b='bottom_B'):
+            assert value('b') == 'bottom_B'
+
+
+def test_value_values_args3():
+    with values({'a': 'top_A'}):
+        with values(a='mid_A'):
+            with values({}, {'a': 'bottom_A'}):
+                assert value('a') == 'bottom_A'
 
 
 def test_values_as_dict1():

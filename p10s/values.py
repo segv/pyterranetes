@@ -124,11 +124,11 @@ def values(*args, **kwargs):
     global VALUES
     old = VALUES
     new = old.copy()
-    for d in args:
-        for k, v in d.items():
-            new.set_value(k, v)
-    for k, v in kwargs.items():
-        new.set_value(k, v)
+
+    for dict in args:
+        new += Values(values=dict)
+    new += Values(values=kwargs)
+
     VALUES = new
     yield
     VALUES = old
