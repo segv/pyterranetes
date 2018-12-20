@@ -15,6 +15,16 @@ Can be used as a dict. Has classmethods, such as
 :py:meth:`p10s.values.Values.from_files` for loading values from
 various sources.
 
+The assumption is that Values won't be created directly, though that's
+certainly possible, but that they're be created from external
+source. If, for example, we want to have our values stored in a yaml
+on disk, and allow over riding form the env, we would this:
+
+.. code-block:: python
+
+    VALUES = Values.from_files(".") + Values.from_environ(".")
+
+
     """
     def __init__(self, values=None):
         if values is not None:
@@ -31,7 +41,6 @@ All the files named ``values.yaml`` in basedir and up the file system
 (up until the file system's root) will be collected and parsed and
 merged. The merging is top down, so values specifed in files closer to
 basedir will over ride values specified in a higher up values file.
-
         """
         basedir = Path(basedir)
         if not basedir.exists():
