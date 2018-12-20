@@ -68,17 +68,22 @@ def test_values_from_environ(mocker):
     assert {'var': 'value'} == values.values
 
 
-def test_values_merge1(mocker):
-    a = Values({'a': 'A'})
-    b = Values({'a': 'B'})
+def test_values_add1(mocker):
+    a = Values({'val': 'A'})
+    b = Values({'val': 'B'})
+
+    a += b
+
+    assert {'val': 'B'} == a.values
+    assert {'val': 'B'} == b.values
+
+
+def test_values_add2(mocker):
+    a = Values({'val': 'A'})
+    b = Values({'val': 'B'})
+
     c = a + b
 
-    assert {'a': 'B'} == c.values
-
-
-def test_values_merge2(mocker):
-    a = Values({'a': {'b': 'A'}})
-    b = Values({'a': {'b': 'B'}})
-    c = a + b
-
-    assert {'a': {'b': 'B'}} == c.values
+    assert {'val': 'A'} == a.values
+    assert {'val': 'B'} == b.values
+    assert {'val': 'B'} == c.values
