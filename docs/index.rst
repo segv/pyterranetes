@@ -34,5 +34,6 @@ Features:
    code-structure
    terraform
    kubernetes
-   values
+   utilities
    indices
+   

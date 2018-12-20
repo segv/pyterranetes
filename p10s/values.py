@@ -120,7 +120,15 @@ def use_values(values):
 
 @contextmanager
 def values(*args, **kwargs):
-    """Run the body with the given key,value pairs bound."""
+    """context manager, runs the body with the given key=value pairs
+bound.
+
+``*args`` is a list of dicts, whose final values will be computed as
+by :func:``merge_dicts <p10s.utils.merge_dicts>`. ``*kwargs`` are
+tweated as a single dict of key=value pairs, and take precedence over
+anything in ``*args``.
+
+    """
     global VALUES
     old = VALUES
     new = old.copy()

@@ -220,9 +220,12 @@ def _data_to_object(data):
         raise Exception("Missing kind property on %s", data)
 
 
-def from_yaml(yaml_string):
-    return _data_to_object(yaml(yaml_string))
+def from_yaml(yaml_input):
+    """Parse the given yaml_input and return the corresponding ``KubernetesObject``"""
+    return _data_to_object(yaml(yaml_input))
 
 
-def many_from_yaml(yaml_string):
-    return [_data_to_object(data) for data in yaml_all(yaml_string)]
+def many_from_yaml(yaml_input):
+    """Parse the documents from ``yaml_input`` and returns a list of ``KubernetesObject``.
+"""
+    return [_data_to_object(data) for data in yaml_all(yaml_input)]

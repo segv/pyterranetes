@@ -13,9 +13,19 @@ question of writing a p10s script which creates a
         default=0
     ))
 
+    c += tf.variables(key="${data.terraform_remote_state.key}"})
+
     c += tf.Resource("type", "name", dict(
         var = 'value'
     ))
+
+    c += tf.from_hcl(""\"
+        module "m" {
+          source = "../m/"
+        }
+    ""\")
+
+    c += tf.outputs(key="${module.m.key}"})
 
     ...
 
@@ -278,19 +288,29 @@ class TypeNameBlock(TerraformBlock):
 
 
 class Terraform(NoArgsBlock):
+    """``terraform`` block. Doesn't expose any properties beyond ``body``."""
     KIND = 'terraform'
 
 
 class Locals(NoArgsBlock):
+    """``locals`` block. Doesn't expose any properties beyond ``body``."""
     KIND = 'locals'
 
 
 class Variable(NameBlock):
+    """``variable`` block. Exposes `.name` as a property.
+
+If you're defining a variable without a type or a description (90% of
+the cases in practice), it is probably easier to use :func:`variables
+<p10s.terraform.variables>`.
+    """
     KIND = 'variable'
 
 
 def variables(**kwargs):
-    """Helper function for defining multiple variable blocks which only specify their default value.
+    """Helper function for defining multiple :class:`variable
+<p10s.terraform.Variable` blocks which only specify their default
+value.
 
 Example:
 
@@ -307,32 +327,35 @@ is short hand for:
   c += tf.Variable("name", {'default': 'value'})
   c += tf.Variable("other", {'default': 'other value'})
 
-
-"""
+    """
     return [Variable(name=name, body={'default': kwargs[name]}) for name in kwargs.keys()]
 
 
 class Output(NameBlock):
     """``output`` block. Exposes `.name` as a property.
 
-The constructor is designed to be convenient in p10s scripts and
-accepts a number of parameters:
+The constructor is designed to be convenient to use in p10s
+scripts. Any (single) keyword argument passed to the constructor,
+other than ``name`` and ``body``, is assumed to be the name of an
+output with the given value.
+
+So this call:
 
 .. code-block:: python
 
-    o = Output("ip", var_name="${aws_eip.ip.public_ip})
+    o = Output(ip="${aws_eip.ip.public_ip})
 
-this simplified constructor works unless the variable you want to
-define is named ``name`` or ``body``. if this every becomes a problem
-in practice we'll see about removing the DIWM-ness.
-
-and, of course, simpler construction works as well:
+is equivalent to this:
 
 .. code-block:: python
 
     o = Output(name="ip", body={
         'var_name': "${aws_eip.ip.public_ip}
     })
+
+The convenience constructor can be used to define exactly one output,
+for similar syntax for multiple outputs see :func:`outputs
+<p10s.terraform.outputs>`
 
     """
     KIND = 'output'
@@ -351,13 +374,13 @@ and, of course, simpler construction works as well:
 
 
 def outputs(**kwargs):
-    """Helper function for defining multiple output blocks.
+    """Helper function for defining multiple :class:`output <p10s.terraform.Output>`  blocks.
 
 Example:
 
 .. code-block:: python
 
-  c += tf.output(
+  c += tf.outputs(
       name='${module.foo.id},
       other='${module.foo.key}')
 
@@ -402,7 +425,12 @@ class HCLParseException(Exception):
 
 
 def many_from_hcl(hcl_string):
-    """Build TerraformBlock objects from hcl text. Always returns a list of blocks."""
+    """Build TerraformBlock objects from hcl text. Always returns a list of blocks.
+
+See :func:`p10s.terraform.from_hcl` for examples and
+:func:`p10s.loads.hcl` for details on the unerlying hcl parser.
+
+    """
 
     try:
         data = hcl(hcl_string)
@@ -440,7 +468,7 @@ def many_from_hcl(hcl_string):
 
 
 def from_hcl(hcl_string):
-    """Build a TerraformBlock from hcl text:
+    """Build a TerraformBlock from hcl text.
 
 :param hcl_string: hcl text to parse
 :type hcl_string: a string, a pathlib.Path, or an io.Base object
@@ -471,12 +499,12 @@ into the p10s script:
 
 .. code-block:: python
 
-    resource = tf.from_hcl(Path('./base.tf').open())
-
     for name in (name1, name2, ...):
+        resource = tf.from_hcl(Path('./base.tf'))
         resource.name = name
-        c += resource.copy()
+        c += resource
 
+See :func:`p10s.loads.hcl` for details on the unerlying hcl parser.
     """
     blocks = many_from_hcl(hcl_string)
 
