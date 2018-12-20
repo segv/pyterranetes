@@ -2,6 +2,7 @@ from pathlib import Path
 from collections import MutableMapping
 from copy import deepcopy
 from contextlib import contextmanager
+import os
 
 from p10s.utils import merge_dicts
 from p10s.loads import load_file
@@ -50,6 +51,14 @@ basedir will over ride values specified in a higher up values file.
             merge_dicts(values, load_file(file))
 
         return cls(values)
+
+    @classmethod
+    def from_environ(cls):
+        """Builds a Values object from the current OS environment."""
+        # NOTE we may be able to just pass in os.enviro directly,
+        # without creating a dict, but i'm not sure what other magic
+        # is on that and this feels safer. 20181220:mb
+        return cls(dict(os.environ))
 
     def copy(self):
         return Values(values=deepcopy(self.values))

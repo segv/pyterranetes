@@ -1,5 +1,6 @@
 flake8
 pytest
+pytest-mock
 sphinx
 tox
 tox-pyenv
