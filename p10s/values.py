@@ -2,6 +2,7 @@ from pathlib import Path
 from collections import MutableMapping
 from copy import deepcopy
 from contextlib import contextmanager
+import os
 
 from p10s.utils import merge_dicts
 from p10s.loads import load_file
@@ -13,6 +14,16 @@ class Values(MutableMapping):
 Can be used as a dict. Has classmethods, such as
 :py:meth:`p10s.values.Values.from_files` for loading values from
 various sources.
+
+The assumption is that Values won't be created directly, though that's
+certainly possible, but that they're be created from external
+source. If, for example, we want to have our values stored in a yaml
+on disk, and allow over riding form the env, we would this:
+
+.. code-block:: python
+
+    VALUES = Values.from_files(".") + Values.from_environ(".")
+
 
     """
     def __init__(self, values=None):
@@ -30,7 +41,6 @@ All the files named ``values.yaml`` in basedir and up the file system
 (up until the file system's root) will be collected and parsed and
 merged. The merging is top down, so values specifed in files closer to
 basedir will over ride values specified in a higher up values file.
-
         """
         basedir = Path(basedir)
         if not basedir.exists():
@@ -50,6 +60,26 @@ basedir will over ride values specified in a higher up values file.
             merge_dicts(values, load_file(file))
 
         return cls(values)
+
+    @classmethod
+    def from_environ(cls):
+        """Builds a Values object from the current OS environment."""
+        # NOTE we may be able to just pass in os.enviro directly,
+        # without creating a dict, but i'm not sure what other magic
+        # is on that and this feels safer. 20181220:mb
+        return cls(dict(os.environ))
+
+    def __add__(self, other):
+        """Returns a new values containg the merge of ``other`` into this
+        object (key/value pairs in ``other`` replace equally named
+        pairs in ``self``)"""
+        new = self.copy()
+        return new.__iadd__(other)
+
+    def __iadd__(self, other):
+        """Modifies ``self`` by merging in the values of ``other``"""
+        self.values = merge_dicts(self.values, other)
+        return self
 
     def copy(self):
         return Values(values=deepcopy(self.values))

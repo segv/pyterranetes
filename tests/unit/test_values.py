@@ -60,3 +60,30 @@ def test_values_as_dict4():
     v = Values()
     v['a'] = 'b'
     assert len(v) == len(v.values)
+
+
+def test_values_from_environ(mocker):
+    mocker.patch('os.environ', new={'var': 'value'})
+    values = Values.from_environ()
+    assert {'var': 'value'} == values.values
+
+
+def test_values_add1(mocker):
+    a = Values({'val': 'A'})
+    b = Values({'val': 'B'})
+
+    a += b
+
+    assert {'val': 'B'} == a.values
+    assert {'val': 'B'} == b.values
+
+
+def test_values_add2(mocker):
+    a = Values({'val': 'A'})
+    b = Values({'val': 'B'})
+
+    c = a + b
+
+    assert {'val': 'A'} == a.values
+    assert {'val': 'B'} == b.values
+    assert {'val': 'B'} == c.values
