@@ -60,6 +60,18 @@ basedir will over ride values specified in a higher up values file.
         # is on that and this feels safer. 20181220:mb
         return cls(dict(os.environ))
 
+    def __add__(self, other):
+        """Returns a new values containg the merge of ``other`` into this
+        object (key/value pairs in ``other`` replace equally named
+        pairs in ``self``)"""
+        new = self.copy()
+        return new.__iadd__(other)
+
+    def __iadd__(self, other):
+        """Modifies ``self`` by merging in the values of ``other``"""
+        self.values = merge_dicts(self.values, other)
+        return self
+
     def copy(self):
         return Values(values=deepcopy(self.values))
 

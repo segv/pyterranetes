@@ -66,3 +66,19 @@ def test_values_from_environ(mocker):
     mocker.patch('os.environ', new={'var': 'value'})
     values = Values.from_environ()
     assert {'var': 'value'} == values.values
+
+
+def test_values_merge1(mocker):
+    a = Values({'a': 'A'})
+    b = Values({'a': 'B'})
+    c = a + b
+
+    assert {'a': 'B'} == c.values
+
+
+def test_values_merge2(mocker):
+    a = Values({'a': {'b': 'A'}})
+    b = Values({'a': {'b': 'B'}})
+    c = a + b
+
+    assert {'a': {'b': 'B'}} == c.values
