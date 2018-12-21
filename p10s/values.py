@@ -1,5 +1,5 @@
 from pathlib import Path
-from collections import MutableMapping
+from collections.abc import MutableMapping
 from copy import deepcopy
 from contextlib import contextmanager
 import os

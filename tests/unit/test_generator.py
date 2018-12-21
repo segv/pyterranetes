@@ -1,6 +1,7 @@
+import pytest
 import json
-from pathlib import Path
-from p10s.generator import Generator
+import os
+from p10s.generator import Generator, P10SScript, _global_state
 import sys
 from copy import deepcopy
 
@@ -11,36 +12,78 @@ def test_find_p10s_files(fixtures_dir):
     bottom = base / 'sub1' / 'sub2' / 'bottom.p10s'
 
     expected = [top, bottom]
-    actual = list(Generator().p10s_files(base))
+    actual = list(Generator()._p10s_scripts(base))
     assert expected == actual
 
 
-def test_add_dir_to_sys_path(monkeypatch, fixtures_dir):
-    base = fixtures_dir / 'generator_data' / 'find_p10s_files'
+def test_find_pyterranetes_dir_as_sibling(fixtures_dir):
+    script = P10SScript(fixtures_dir / 'generator_data' / 'with_lib' / 'top.p10s')
+    assert script.pyterranetes_dir == fixtures_dir / 'generator_data' / 'with_lib' / 'pyterranetes'
+
+
+def test_find_pyterranetes_dir_as_parent(fixtures_dir):
+    script = P10SScript(fixtures_dir / 'generator_data' / 'with_lib' / 'sub' / 'bottom.p10s')
+    assert script.pyterranetes_dir == fixtures_dir / 'generator_data' / 'with_lib' / 'pyterranetes'
+
+
+def test_find_pyterranetes_dir_as_grandparent(fixtures_dir):
+    script = P10SScript(fixtures_dir / 'generator_data' / 'with_lib' / 'sub' / 'sub' / 'underground.p10s')
+    assert script.pyterranetes_dir == fixtures_dir / 'generator_data' / 'with_lib' / 'pyterranetes'
+
+
+def test_global_state_set_sys_path(monkeypatch, fixtures_dir):
+    base = fixtures_dir / 'generator_data' / 'with_lib'
     target = base / 'pyterranetes'
-    start = base / 'sub1' / 'sub2'
+    start = base / 'sub'
+    here = os.getcwd()
     with monkeypatch.context() as m:
         old_path = deepcopy(sys.path)
         m.setattr('sys.path', sys.path)
-        Generator().add_pyterranetes_dir(start)
-        assert target == Path(sys.path[0])
-        assert old_path == sys.path[1:]
+        try:
+            os.chdir(str(start))
+            with _global_state(dir=fixtures_dir, extra_sys_paths=[target]):
+                assert [str(target)] + old_path == sys.path
+                assert os.getcwd() == str(fixtures_dir)
+            assert old_path == sys.path
+            assert os.getcwd() == str(start)
+        finally:
+            os.chdir(here)
 
 
-def test_compute_output_file(fixtures_dir):
+def test_global_state_import_works(monkeypatch, fixtures_dir):
+    base = fixtures_dir / 'generator_data' / 'with_lib'
+    target = base / 'pyterranetes'
+    start = base / 'sub'
+    here = os.getcwd()
+
+    try:
+        os.chdir(str(start))
+        with _global_state(dir=fixtures_dir, extra_sys_paths=[target]):
+            try:
+                from import_test import SUCCESS  # noqa: F401
+            except ModuleNotFoundError:
+                pytest.fail("unable to import infra")
+    finally:
+        os.chdir(here)
+
+
+def test_compute_p10s_script(fixtures_dir):
     input = fixtures_dir / 'generator_data' / 'simple' / 'simple.p10s'
-    g = Generator()
-    outputs = g.compile(input)
-    assert len(outputs) == 1
-    output = outputs[0].contexts[0]
-    assert output.input == input
-    assert output.output == input.with_suffix('.tf.json')
+    script = P10SScript(filename=input)
+    # g = Generator()
+    # outputs = g.compile(input)
+    script.compile()
+    contexts = script.contexts
+    assert len(contexts) == 1
+    context = contexts[0]
+    assert context.input == input
+    assert context.output == input.with_suffix('.tf.json')
     assert {'resource':
             {'a':
              {'b': {'count': 1},
               'c': {'count': 2}},
              'b':
-             {'b': {'count': 3}}}} == output.data
+             {'b': {'count': 3}}}} == context.data
 
 
 def test_generate(fixtures_dir):
