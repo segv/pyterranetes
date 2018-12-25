@@ -1,6 +1,7 @@
 import pytest
 import p10s.terraform as tf
 import shutil
+from copy import deepcopy
 
 
 def test_init():
@@ -215,12 +216,42 @@ def test_copy_resource():
     t = tf.Variable("var1", dict(default=1))
     c = tf.Context()
 
-    c += t.copy()
+    c += deepcopy(t)
     t.name = 'var2'
     c += t
 
     assert c.data == {'variable': {'var1': {'default': 1},
                                    'var2': {'default': 1}}}
+
+
+def test_duplicate_variable():
+    v1 = tf.Variable("var1", dict(default=1))
+    v2 = tf.Variable("var1", dict(other=42))
+
+    c = tf.Context(strict=True)
+    c += v1
+    with pytest.raises(tf.DuplicateBlockError):
+        c += v2
+
+
+def test_duplicate_resource():
+    r1 = tf.Resource("type", "name", dict(var1='val1'))
+    r2 = tf.Resource("type", "name", dict(var2='val2'))
+
+    c = tf.Context(strict=True)
+    c += r1
+    with pytest.raises(tf.DuplicateBlockError):
+        c += r2
+
+
+def test_duplicate_terraform():
+    t1 = tf.Terraform(dict(var1='val1'))
+    t2 = tf.Terraform(dict(var2='val2'))
+
+    c = tf.Context(strict=True)
+    c += t1
+    with pytest.raises(tf.DuplicateBlockError):
+        c += t2
 
 
 def test_output1():

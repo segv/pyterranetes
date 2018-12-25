@@ -34,41 +34,7 @@ For each terraform configuration block there is a corresponding python
 class. Depending on the block type and how it's used some of the
 classes provid convenience methods and constructors. All of the
 classes have a ``.body`` property representing the data inside the
-block. This body is stored as a python dict with a simple mapping from
-python to hcl:
-
-``key: value``
-    a line setting ``key`` to ``value`` (a string or a number)
-``key: [ ... ]``
-    a line setting ``key`` to a list
-``key: { ... }``
-    a nested block ``key { ... }``
-
-for example the following ``tf.Module`` object:
-
-.. code-block:: python
-
-    tf.Module(name="name", body={
-        'a': {
-            'b': 2,
-            'c': {
-                'd': ["start", "end"]
-            }
-        }
-    })
-
-would generate the following hcl:
-
-.. code-block:: terraform
-
-    module "name" {
-      a = {
-        b = 2
-        c = {
-          d = ["start", "end"]
-        }
-      }
-    }
+block.
 
 There are 3 different categories of terraform blocks:
 
@@ -120,6 +86,8 @@ in the output.
 
 import json
 from copy import deepcopy
+import collections.abc
+
 from p10s.loads import hcl
 from p10s.utils import merge_dicts
 from p10s.base import BaseContext
@@ -133,14 +101,21 @@ As with the k8s.Context this instances of this class represent a
 single terraform file. Block of terraform can be added using the
 ``+=`` operator.
 
+By default adding the same terraform block multiple times to a context
+does not cause any errors, the values will be merged in as normal. If
+needed more strict verification can be added by passing `strict=True`
+to the Context constructor.
+
     """
     output_file_extension = '.tf.json'
 
-    def __init__(self, *args, data=None, **kwargs):
+    def __init__(self, *args, data=None, strict=False, **kwargs):
         if data is None:
             self.data = {}
         else:
             self.data = data
+
+        self.strict = strict
 
         super().__init__(*args, **kwargs)
 
@@ -152,11 +127,24 @@ single terraform file. Block of terraform can be added using the
         if not isinstance(block, (list, tuple)):
             block = [block]
         for b in block:
+            if self.strict:
+                existing = self.lookup(b._key())
+                if existing is not None:
+                    raise DuplicateBlockError(existing, block)
             self._merge_in(b.data)
         return self
 
-    def copy(self):
-        return self.__class__(input=self.input, output=self.output, data=deepcopy(self.data))
+    def lookup(self, key):
+        def _rec(here, path):
+            if len(path) == 0:
+                return here
+            if isinstance(here, collections.abc.Mapping):
+                if path[0] in here:
+                    first = path.pop(0)
+                    return _rec(here[first], path)
+            return None
+
+        return _rec(self.data, key)
 
     def __iadd__(self, block):
         """Add ``block`` to the context's data, destructively modifies ``self``
@@ -170,11 +158,17 @@ single terraform file. Block of terraform can be added using the
 
 :param TerraformBlock block:
 """
-        return self.copy().add(block)
+        return deepcopy(self).add(block)
 
     def render(self):
         with self._output_stream() as tf_json:
             tf_json.write(json.dumps(self.data, indent=4, sort_keys=True))
+
+
+class DuplicateBlockError(ValueError):
+    def __init__(self, existing, new_block):
+        self.existing = existing
+        self.new_block = new_block
 
 
 class TerraformBlock():
@@ -207,6 +201,9 @@ change ``name`` or ``type`` or any of the block's properties."""
     def _body(self):
         raise NotImplementedError()
 
+    def _key(self):
+        raise NotImplementedError()
+
 
 class NoArgsBlock(TerraformBlock):
     def __init__(self, body):
@@ -214,11 +211,11 @@ class NoArgsBlock(TerraformBlock):
             self.KIND: body or {}
         })
 
-    def copy(self):
-        return self.__class__(body=deepcopy(self.body))
-
     def _body(self):
         return self.data[self.KIND]
+
+    def _key(self):
+        return [self.KIND]
 
 
 class NameBlock(TerraformBlock):
@@ -229,9 +226,6 @@ class NameBlock(TerraformBlock):
                 name: body or {}
             }
         })
-
-    def copy(self):
-        return self.__class__(name=self.name, body=deepcopy(self.body))
 
     def _body(self):
         return self.data[self.KIND][self.name]
@@ -247,6 +241,9 @@ class NameBlock(TerraformBlock):
             del self.data[self.KIND][self._name]
             self._name = name
 
+    def _key(self):
+        return [self.KIND, self.name]
+
 
 class TypeNameBlock(TerraformBlock):
     def __init__(self, type, name, body=None):
@@ -259,9 +256,6 @@ class TypeNameBlock(TerraformBlock):
                 }
             }
         })
-
-    def copy(self):
-        return self.__class__(type=self.type, name=self.name, body=deepcopy(self.body))
 
     def _body(self):
         return self.data[self.KIND][self._type][self._name]
@@ -285,6 +279,9 @@ class TypeNameBlock(TerraformBlock):
         self.data[self.KIND][self._type][name] = self.data[self.KIND][self._type][self.name]
         del self.data[self.KIND][self._type][self._name]
         self._name = name
+
+    def _key(self):
+        return [self.KIND, self.type, self.name]
 
 
 class Terraform(NoArgsBlock):
