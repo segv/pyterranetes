@@ -199,10 +199,10 @@ change ``name`` or ``type`` or any of the block's properties."""
         return self
 
     def _body(self):
-        raise NotImplementedError()
+        raise NotImplementedError()  # pragma: no cover
 
     def _key(self):
-        raise NotImplementedError()
+        raise NotImplementedError()  # pragma: no cover
 
 
 class NoArgsBlock(TerraformBlock):

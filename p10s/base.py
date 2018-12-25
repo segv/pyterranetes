@@ -17,7 +17,7 @@ class BaseContext():
             self.output = None
 
     def render(self):
-        raise NotImplementedError()
+        raise NotImplementedError() # pragma: no cover
 
     def _output_stream(self):
         self.output.parent.mkdir(parents=True, exist_ok=True)

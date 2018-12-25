@@ -30,6 +30,6 @@ Base Classes
 ------------
 
 .. autoclass:: p10s.terraform.Context
-   :members: copy, __add__, __iadd__
+   :members: __add__, __iadd__
 .. autoclass:: p10s.terraform.TerraformBlock
    :members:
