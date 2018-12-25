@@ -43,6 +43,12 @@ def test_load_file(fixtures_dir):
     assert {'foo': True} == load_file(fixtures_dir / 'sample.yaml')
 
 
-def test_load_file_exception(fixtures_dir):
+@pytest.mark.parametrize('invalid_filename', [
+    'does_not_exist.txt',
+    'invalid/file.json',
+    'invalid/file.yaml',
+    'invalid/file.hcl'
+])
+def test_load_file_exception(fixtures_dir, invalid_filename):
     with pytest.raises(Exception):
-        load_file(fixtures_dir / 'sample.txt')
+        load_file(fixtures_dir / invalid_filename)
