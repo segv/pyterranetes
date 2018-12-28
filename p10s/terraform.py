@@ -97,14 +97,14 @@ from pprint import pformat
 class Context(BaseContext):
     """Context for terraform files.
 
-As with the k8s.Context this instances of this class represent a
-single terraform file. Block of terraform can be added using the
-``+=`` operator.
+    As with the k8s.Context this instances of this class represent a
+    single terraform file. Block of terraform can be added using the
+    ``+=`` operator.
 
-By default adding the same terraform block multiple times to a context
-does not cause any errors, the values will be merged in as normal. If
-needed more strict verification can be added by passing `strict=True`
-to the Context constructor.
+    By default adding the same terraform block multiple times to a context
+    does not cause any errors, the values will be merged in as normal. If
+    needed more strict verification can be added by passing `strict=True`
+    to the Context constructor.
 
     """
     output_file_extension = '.tf.json'
@@ -149,15 +149,15 @@ to the Context constructor.
     def __iadd__(self, block):
         """Add ``block`` to the context's data, destructively modifies ``self``
 
-:param TerraformBlock block:
-"""
+        :param TerraformBlock block:
+        """
         return self.add(block)
 
     def __add__(self, block):
         """Returns a new context containg all the data in ``self`` and ``block``
 
-:param TerraformBlock block:
-"""
+        :param TerraformBlock block:
+        """
         return deepcopy(self).add(block)
 
     def render(self):
@@ -174,8 +174,8 @@ class DuplicateBlockError(ValueError):
 class TerraformBlock():
     """Abstract base class for all terrform blocks.
 
-Exposes the :py:meth:`.body <p10s.terrform.TerraformBlock.body>`
-property for direct manipulation of the block's data.
+    Exposes the :py:meth:`.body <p10s.terrform.TerraformBlock.body>`
+    property for direct manipulation of the block's data.
 
     """
     def __init__(self, data=None):
@@ -188,13 +188,18 @@ property for direct manipulation of the block's data.
     @property
     def body(self):
         """Returns the data contained in thie block. name, type, provider or
-other non-body values are exposed as properties on the corresponding
-object."""
+        other non-body values are exposed as properties on the
+        corresponding object.
+
+        """
         return self._body()
 
     def update(self, new_body_values):
         """Merges in ``new_body_values`` with this block's body. Does not
-change ``name`` or ``type`` or any of the block's properties."""
+        change ``name`` or ``type`` or any of the block's
+        properties.
+
+        """
         merge_dicts(self.body, new_body_values)
         return self
 
@@ -297,32 +302,33 @@ class Locals(NoArgsBlock):
 class Variable(NameBlock):
     """``variable`` block. Exposes `.name` as a property.
 
-If you're defining a variable without a type or a description (90% of
-the cases in practice), it is probably easier to use :func:`variables
-<p10s.terraform.variables>`.
+    If you're defining a variable without a type or a description (90%
+    of the cases in practice), it is probably easier to use
+    :func:`variables <p10s.terraform.variables>`.
+
     """
     KIND = 'variable'
 
 
 def variables(**kwargs):
     """Helper function for defining multiple :class:`variable
-<p10s.terraform.Variable` blocks which only specify their default
-value.
+    <p10s.terraform.Variable` blocks which only specify their default
+    value.
 
-Example:
+    Example:
 
-.. code-block:: python
+    .. code-block:: python
 
-  c += tf.variables(
-      name='value,
-      other='other value')
+      c += tf.variables(
+          name='value,
+          other='other value')
 
-is short hand for:
+    is short hand for:
 
-.. code-block:: python
+    .. code-block:: python
 
-  c += tf.Variable("name", {'default': 'value'})
-  c += tf.Variable("other", {'default': 'other value'})
+      c += tf.Variable("name", {'default': 'value'})
+      c += tf.Variable("other", {'default': 'other value'})
 
     """
     return [Variable(name=name, body={'default': kwargs[name]}) for name in kwargs.keys()]
@@ -331,28 +337,28 @@ is short hand for:
 class Output(NameBlock):
     """``output`` block. Exposes `.name` as a property.
 
-The constructor is designed to be convenient to use in p10s
-scripts. Any (single) keyword argument passed to the constructor,
-other than ``name`` and ``body``, is assumed to be the name of an
-output with the given value.
+    The constructor is designed to be convenient to use in p10s
+    scripts. Any (single) keyword argument passed to the constructor,
+    other than ``name`` and ``body``, is assumed to be the name of an
+    output with the given value.
 
-So this call:
+    So this call:
 
-.. code-block:: python
+    .. code-block:: python
 
-    o = Output(ip="${aws_eip.ip.public_ip})
+        o = Output(ip="${aws_eip.ip.public_ip})
 
-is equivalent to this:
+    is equivalent to this:
 
-.. code-block:: python
+    .. code-block:: python
 
-    o = Output(name="ip", body={
-        'var_name': "${aws_eip.ip.public_ip}
-    })
+        o = Output(name="ip", body={
+            'var_name': "${aws_eip.ip.public_ip}
+        })
 
-The convenience constructor can be used to define exactly one output,
-for similar syntax for multiple outputs see :func:`outputs
-<p10s.terraform.outputs>`
+    The convenience constructor can be used to define exactly one output,
+    for similar syntax for multiple outputs see :func:`outputs
+    <p10s.terraform.outputs>`
 
     """
     KIND = 'output'
@@ -373,23 +379,23 @@ for similar syntax for multiple outputs see :func:`outputs
 def outputs(**kwargs):
     """Helper function for defining multiple :class:`output <p10s.terraform.Output>`  blocks.
 
-Example:
+    Example:
 
-.. code-block:: python
+    .. code-block:: python
 
-  c += tf.outputs(
-      name='${module.foo.id},
-      other='${module.foo.key}')
+      c += tf.outputs(
+          name='${module.foo.id},
+          other='${module.foo.key}')
 
-is short hand for:
+    is short hand for:
 
-.. code-block:: python
+    .. code-block:: python
 
-  c += tf.Output("name", {'value': '${module.foo.id}'})
-  c += tf.Output("other", {'value': '${module.foo.key}'})
+      c += tf.Output("name", {'value': '${module.foo.id}'})
+      c += tf.Output("other", {'value': '${module.foo.key}'})
 
 
-"""
+    """
     return [Output(name=name, body={'value': kwargs[name]}) for name in kwargs.keys()]
 
 
@@ -424,8 +430,8 @@ class HCLParseException(Exception):
 def many_from_hcl(hcl_string):
     """Build TerraformBlock objects from hcl text. Always returns a list of blocks.
 
-See :func:`p10s.terraform.from_hcl` for examples and
-:func:`p10s.loads.hcl` for details on the unerlying hcl parser.
+    See :func:`p10s.terraform.from_hcl` for examples and
+    :func:`p10s.loads.hcl` for details on the unerlying hcl parser.
 
     """
 
@@ -467,41 +473,41 @@ See :func:`p10s.terraform.from_hcl` for examples and
 def from_hcl(hcl_string):
     """Build a TerraformBlock from hcl text.
 
-:param hcl_string: hcl text to parse
-:type hcl_string: a string, a pathlib.Path, or an io.Base object
+    :param hcl_string: hcl text to parse
+    :type hcl_string: a string, a pathlib.Path, or an io.Base object
 
-.. code-block:: python
+    .. code-block:: python
 
-    c += tf.from_hcl(\"\"\"
-      foo { }
-    "\"\")
+        c += tf.from_hcl(\"\"\"
+          foo { }
+        "\"\")
 
-Note that the return value is an instance of tf.TerraformBlock, and
-has all the corresponding methods:
+    Note that the return value is an instance of tf.TerraformBlock, and
+    has all the corresponding methods:
 
-.. code-block:: python
+    .. code-block:: python
 
-    resource = tf.from_hcl('''
-      resource "type" "name" {
-        key = 'value'
-      }
-    ''')
+        resource = tf.from_hcl('''
+          resource "type" "name" {
+            key = 'value'
+          }
+        ''')
 
-    resource.body['key'] = 'other value'
+        resource.body['key'] = 'other value'
 
-It can be convenient to keep most of the terraform code in a seperate
-file and only use pyterranetes for certain operations. In this case
-it's often best to leave the terraform code seperate and just read it
-into the p10s script:
+    It can be convenient to keep most of the terraform code in a seperate
+    file and only use pyterranetes for certain operations. In this case
+    it's often best to leave the terraform code seperate and just read it
+    into the p10s script:
 
-.. code-block:: python
+    .. code-block:: python
 
-    for name in (name1, name2, ...):
-        resource = tf.from_hcl(Path('./base.tf'))
-        resource.name = name
-        c += resource
+        for name in (name1, name2, ...):
+            resource = tf.from_hcl(Path('./base.tf'))
+            resource.name = name
+            c += resource
 
-See :func:`p10s.loads.hcl` for details on the unerlying hcl parser.
+    See :func:`p10s.loads.hcl` for details on the unerlying hcl parser.
     """
     blocks = many_from_hcl(hcl_string)
 
