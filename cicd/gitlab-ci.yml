@@ -6,39 +6,34 @@ before_script:
 variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
 
-stages: [ test, deploy ]
+stages: [ test-python, test-docs, deploy ]
 
-test:3.5:
-  stage: test
+test:py35: &test-python
+  stage: test-python
   image: python:3.5
   script: [ tox -e py35 ]
   coverage: '/^TOTAL.*\s(\d+)%\s*$/'
 
-test:3.6:
-  stage: test
+test:py36:
+  <<: *test-python
   image: python:3.6
   script: [ tox -e py36 ]
-  coverage: '/^TOTAL.*\s(\d+)%\s*$/'
 
-test:3.7:
-  stage: test
+test:py37:
+  <<: *test-python
   image: python:3.7
   script: [ tox -e py37 ]
-  coverage: '/^TOTAL.*\s(\d+)%\s*$/'
 
-test:build-docs:
-  stage: test
+test:build-docs: &make-docs
+  stage: test-docs
   image: python:3.7
   script:
     - pip3 install --upgrade --force-reinstall -e .
     - sphinx-build -W ./docs ./public
 
 pages:
-  image: python:3.7
+  <<: *make-docs
   stage: deploy
-  script:
-    - pip3 install --upgrade --force-reinstall -e .
-    - sphinx-build -W ./docs ./public
   artifacts:
     paths: [ ./public ]
   only: [ master ]

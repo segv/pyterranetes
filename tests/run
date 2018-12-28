@@ -1,0 +1,21 @@
+#!/bin/bash
+set -euo pipefail
+
+PROJECT_ROOT=$(readlink -f $(dirname $BASH_SOURCE[0])/../)
+
+export PYTHONPATH=${PROJECT_ROOT}
+
+pip install -U -e ${PROJECT_ROOT}
+
+# NOTE i don't know how to cleanly copy $@ to $ARGS. so if $@ is empty
+# we set ARGS to what we'd like it do be, if it's not empty we set
+# args to nothing. then we pass both to pyest. this way we get the
+# defaulting args behaviour we want and don't need to copy $@ to
+# another variable. would be nice to make this cleaner 20181229:mb
+if [[ $# -eq 0 ]]; then
+    ARGS=("--lf" "--cov=p10s")
+else
+    ARGS=""
+fi
+
+pytest -vvv "$ARGS" "$@" ${PROJECT_ROOT}/tests/
