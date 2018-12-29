@@ -438,11 +438,12 @@ class Data(TypeNameBlock):
 
 
 class HCLParseError(Exception):
-    def __init__(self, data):
+    def __init__(self, data, error=None):
         self.data = data
+        self.error = error
 
     def __str__(self):
-        return "Unable to parse HCL text %s" % pformat(self.data)
+        return "Unable to parse HCL text %s: %s" % (pformat(self.data), self.error)
 
 
 class HCLUnknownBlockError(HCLParseError):
@@ -464,7 +465,7 @@ def many_from_hcl(hcl_string):
     try:
         data = hcl(hcl_string)
     except Exception as e:
-        raise HCLParseError(data=hcl_string) from e
+        raise HCLParseError(data=hcl_string, error=e) from e
 
     blocks = []
 
