@@ -209,6 +209,9 @@ class TerraformBlock():
     def _key(self):
         raise NotImplementedError()  # pragma: no cover
 
+    def __eq__(self, other):
+        return self.__dict__ == other.__dict__
+
 
 class NoArgsBlock(TerraformBlock):
     def __init__(self, body):
@@ -221,6 +224,9 @@ class NoArgsBlock(TerraformBlock):
 
     def _key(self):
         return [self.KIND]
+
+    def __repr__(self):
+        return "#<%s %s>" % (self.KIND, len(self.body))
 
 
 class NameBlock(TerraformBlock):
@@ -248,6 +254,9 @@ class NameBlock(TerraformBlock):
 
     def _key(self):
         return [self.KIND, self.name]
+
+    def __repr__(self):
+        return "#<%s %s %s>" % (self.KIND, self.name, len(self.body))
 
 
 class TypeNameBlock(TerraformBlock):
@@ -288,6 +297,9 @@ class TypeNameBlock(TerraformBlock):
     def _key(self):
         return [self.KIND, self.type, self.name]
 
+    def __repr__(self):
+        return "#<%s %s %s %s>" % (self.KIND, self.type, self.name, len(self.body))
+
 
 class Terraform(NoArgsBlock):
     """``terraform`` block. Doesn't expose any properties beyond ``body``."""
@@ -308,6 +320,9 @@ class Variable(NameBlock):
 
     """
     KIND = 'variable'
+
+    def __repr__(self):
+        return "#<%s %s %s>" % (self.KIND, self.name, self.body.get('default', None))
 
 
 def variables(**kwargs):
@@ -374,6 +389,9 @@ class Output(NameBlock):
             }
 
         super().__init__(name=name, body=body)
+
+    def __repr__(self):
+        return "#<%s %s %s>" % (self.KIND, self.name, self.body.get('value', None))
 
 
 def outputs(**kwargs):
@@ -467,7 +485,7 @@ def many_from_hcl(hcl_string):
                         cls = Data
                     blocks.append(cls(type=type, name=name, body=data[kind][type][name]))
 
-    return blocks
+    return sorted(blocks, key=lambda b: repr(b))
 
 
 def from_hcl(hcl_string):
