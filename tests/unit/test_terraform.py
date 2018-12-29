@@ -149,6 +149,32 @@ def test_single_parse():
     assert c1.data == c2.data
 
 
+def test_many_from_hcl_order():
+    c = tf.Context()
+    many = tf.many_from_hcl("""
+    variable "" {
+      default = "1"
+    }
+
+    variable "a" {
+      default = "1"
+    }
+
+    variable "a/b" {
+      default = "1"
+    }
+
+    variable "a/b/c" {
+      default = "1"
+    }
+
+    """)
+    assert [tf.Variable(name="", body={'default': '1'}),
+            tf.Variable(name="a", body={'default': '1'}),
+            tf.Variable(name="a/b", body={'default': '1'}),
+            tf.Variable(name="a/b/c", body={'default': '1'}),]  == many
+
+
 def test_hcl_as_data():
     c1 = tf.Context()
     c1 += tf.many_from_hcl("""
