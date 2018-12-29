@@ -118,20 +118,25 @@ def test_single_hcl_raises():
         """)
 
 
+def test_many_from_hcl_unknown_key():
+    with pytest.raises(tf.HCLUnknownBlockError):
+        tf.many_from_hcl("""key { }""")
+
+
 def test_many_from_hcl_no_data():
-    with pytest.raises(tf.HCLParseException):
+    with pytest.raises(tf.HCLParseError):
         tf.many_from_hcl(""" """)
 
 
 def test_from_hcl_no_data():
-    with pytest.raises(tf.HCLParseException):
+    with pytest.raises(tf.HCLParseError):
         tf.from_hcl(""" """)
 
 
 def test_from_hcl_no_data2():
     try:
         tf.from_hcl(""" """)
-    except tf.HCLParseException as e:
+    except tf.HCLParseError as e:
         assert str(e).startswith("Unable to parse")
     else:
         pytest.fail("from_hcl did not raise an exception")
@@ -199,6 +204,51 @@ def test_hcl_as_data():
                     }
                 }
             }} == c1.data
+
+
+def test_hcl_heredoc():
+    c = tf.Context()
+    c += tf.many_from_hcl("""
+        resource "foo" "bar" {
+data1 = <<HEREDOC
+   this is a test
+HEREDOC
+data2 = "this is not a test"
+}
+""")
+    assert {'resource':
+            {'foo': {
+                'bar': {'data1': '   this is a test',
+                        'data2': 'this is not a test'}}}} == c.data
+
+
+def test_hcl_nested_named_block():
+    c = tf.Context()
+    c += tf.many_from_hcl("""
+terraform {
+  backend "foo" {
+    foo = "bar"
+    bar = ["baz"]
+
+    map = {
+      a = "b"
+    }
+  }
+}
+""")
+    assert {
+        'terraform': {
+            'backend': {
+                'foo': {
+                    'foo': 'bar',
+                    'bar': ['baz'],
+                    'map': {
+                        'a': 'b'
+                    }
+                }
+            }
+        }
+    } == c.data
 
 
 def test_modify_resource():
