@@ -437,12 +437,20 @@ class Data(TypeNameBlock):
     KIND = 'data'
 
 
-class HCLParseException(Exception):
+class HCLParseError(Exception):
     def __init__(self, data):
         self.data = data
 
     def __str__(self):
         return "Unable to parse HCL text %s" % pformat(self.data)
+
+
+class HCLUnknownBlockError(HCLParseError):
+    def __init__(self, kind):
+        self.kind = kind
+
+    def __str__(self):
+        return "Unknown terraform block type %s" % self.kind
 
 
 def many_from_hcl(hcl_string):
@@ -456,14 +464,14 @@ def many_from_hcl(hcl_string):
     try:
         data = hcl(hcl_string)
     except Exception as e:
-        raise HCLParseException(data=hcl_string) from e
+        raise HCLParseError(data=hcl_string) from e
 
     blocks = []
 
     for kind in data.keys():
         if kind == 'terraform':
             blocks.append(Terraform(body=data[kind]))
-        if kind in ('variable', 'output', 'local', 'module', 'provider'):
+        elif kind in ('variable', 'output', 'local', 'module', 'provider'):
             for name in data[kind].keys():
                 if kind == 'variable':
                     cls = Variable
@@ -476,7 +484,7 @@ def many_from_hcl(hcl_string):
                 if kind == 'provider':
                     cls = Provider
                 blocks.append(cls(name=name, body=data[kind][name]))
-        if kind in ('resource', 'data'):
+        elif kind in ('resource', 'data'):
             for type in data[kind].keys():
                 for name in data[kind][type]:
                     if kind == 'resource':
@@ -484,6 +492,8 @@ def many_from_hcl(hcl_string):
                     if kind == 'data':
                         cls = Data
                     blocks.append(cls(type=type, name=name, body=data[kind][type][name]))
+        else:
+            raise HCLUnknownBlockError(kind=kind)
 
     return sorted(blocks, key=lambda b: repr(b))
 
