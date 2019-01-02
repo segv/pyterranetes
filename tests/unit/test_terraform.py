@@ -177,49 +177,67 @@ def test_many_from_hcl_order():
     assert [tf.Variable(name="", body={'default': '1'}),
             tf.Variable(name="a", body={'default': '1'}),
             tf.Variable(name="a/b", body={'default': '1'}),
-            tf.Variable(name="a/b/c", body={'default': '1'}),]  == many
+            tf.Variable(name="a/b/c", body={'default': '1'})] == many
 
 
-def test_hcl_as_data():
+@pytest.mark.parametrize("hcl,data", [("""terraform {
+                                            foo = "bar"
+                                          }
+                                          resource "type" "name" {
+                                             whatever {
+                                               here = "there"
+                                             }
+                                           }
+                                          """,
+                                       {'terraform': {'foo': 'bar'},
+                                        'resource': {
+                                            'type': {
+                                                'name': {
+                                                    'whatever': {
+                                                        'here': 'there'
+                                                    }
+                                                }
+                                            }
+                                        }}),
+                                      ("""locals {
+                                            other {
+                                              nested {
+                                                value = "value"
+                                              }
+                                            }
+                                          }
+
+                                          locals {
+                                            locals = "whatever"
+                                          }
+                                      """,
+                                       {'locals': {
+                                           'other': {
+                                               'nested': {
+                                                   'value': 'value'
+                                               }
+                                           },
+                                           'locals': 'whatever'
+                                       }
+                                       }),
+                                      ("""resource "foo" "bar" {
+                                            data1 = <<HEREDOC
+                                             this is a test
+                                          HEREDOC
+                                            data2 = "this is not a test"
+                                          }
+                                      """,
+                                       {'resource':
+                                        {'foo': {
+                                            'bar': {
+                                                'data1': '                                             this is a test\n'
+                                                         '                                          ',
+                                                'data2': 'this is not a test'}}}})],
+                         ids=['two blocks', 'two locals blocs', 'heredoc'])
+def test_hcl_as_data(hcl, data):
     c1 = tf.Context()
-    c1 += tf.many_from_hcl("""
-    terraform {
-      foo = "bar"
-    }
-
-    resource "type" "name" {
-      whatever {
-        here = "there"
-      }
-    }
-
-    """)
-    assert {'terraform': {'foo': 'bar'},
-            'resource': {
-                'type': {
-                    'name': {
-                        'whatever': {
-                            'here': 'there'
-                        }
-                    }
-                }
-            }} == c1.data
-
-
-def test_hcl_heredoc():
-    c = tf.Context()
-    c += tf.many_from_hcl("""
-        resource "foo" "bar" {
-data1 = <<HEREDOC
-   this is a test
-HEREDOC
-data2 = "this is not a test"
-}
-""")
-    assert {'resource':
-            {'foo': {
-                'bar': {'data1': '   this is a test',
-                        'data2': 'this is not a test'}}}} == c.data
+    c1 += tf.many_from_hcl(hcl)
+    assert data == c1.data
 
 
 def test_hcl_nested_named_block():

@@ -472,14 +472,14 @@ def many_from_hcl(hcl_string):
     for kind in data.keys():
         if kind == 'terraform':
             blocks.append(Terraform(body=data[kind]))
-        elif kind in ('variable', 'output', 'local', 'module', 'provider'):
+        elif kind == 'locals':
+            blocks.append(Locals(body=data[kind]))
+        elif kind in ('variable', 'output', 'locals', 'module', 'provider'):
             for name in data[kind].keys():
                 if kind == 'variable':
                     cls = Variable
                 if kind == 'output':
                     cls = Output
-                if kind == 'local':
-                    cls = Locals
                 if kind == 'module':
                     cls = Module
                 if kind == 'provider':
