@@ -148,4 +148,4 @@ def test_pwd(fixtures_dir):
     output_data = json.load(output.open())
     assert {'data':
             {'bar':
-             {'foo': {'__file__': str(input.parent.resolve())}}}} == output_data
+             {'foo': {'pwd': str(input.parent.resolve())}}}} == output_data

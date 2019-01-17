@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 import click
 from pprint import pprint  # noqa: F401
+
 from p10s.generator import Generator
+from p10s.watcher import Watcher
 
 
 class AliasedGroup(click.Group):
@@ -30,6 +32,15 @@ def generate(filename):
         filename = ['.']
     for f in filename:
         Generator().generate(f)
+
+
+@cli.command()
+@click.option('--ignore-dotfiles', type=bool, default=True)
+@click.argument('directory', nargs=1, default='.')
+def watch(directory, ignore_dotfiles):
+    watcher = Watcher(directory, ignore_dotfiles)
+    watcher.install_signal_handlers()
+    watcher.watch()
 
 
 if __name__ == '__main__':

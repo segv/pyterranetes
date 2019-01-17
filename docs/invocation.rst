@@ -14,3 +14,14 @@ directory for ``generate`` is ``.``, so the above is equivalent to:
 .. code-block:: bash
 
     $ p10s g
+
+The ``watch`` sub command can be used to automatically generate any
+p10s modified or created in a particular dir:
+
+.. code-block:: bash
+
+    $ p10s watch .
+    ...
+    ^C
+    $
+
