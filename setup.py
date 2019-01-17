@@ -22,7 +22,8 @@ VERSION = None
 REQUIRED = [
     'Click==7.0',
     'ruamel.yaml==0.15.81',
-    'pyhcl==0.3.10'
+    'pyhcl==0.3.10',
+    'watchdog==0.9.0'
 ]
 
 # What packages are optional?

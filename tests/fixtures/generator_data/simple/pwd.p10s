@@ -5,4 +5,4 @@ import os
 
 c = tf.Context()
 
-c += tf.Data(name="foo", type="bar", body={'__file__': str(Path(os.getcwd()).resolve())})
+c += tf.Data(name="foo", type="bar", body={'pwd': str(Path(os.getcwd()).resolve())})
