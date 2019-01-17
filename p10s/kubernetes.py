@@ -104,19 +104,12 @@ Really is just a YAML context.
                             out)
 
 
-class KubernetesObject():
-    KIND = None
-
-    def __init__(self, data=None, kind=None):
+class Data():
+    def __init__(self, data=None):
         if data is None:
             self.data = {}
         else:
             self.data = data
-
-        if kind is not None:
-            self.kind = kind
-        elif self.KIND is not None:
-            self.kind = self.KIND
 
     def render(self):
         def _rec(object):
@@ -124,7 +117,7 @@ class KubernetesObject():
                 return [_rec(o) for o in object]
             elif isinstance(object, dict):
                 return {_rec(k): _rec(v) for k, v in object.items()}
-            elif isinstance(object, KubernetesObject):
+            elif isinstance(object, Data):
                 return object.render()
             else:
                 return object
@@ -139,6 +132,18 @@ class KubernetesObject():
         """Merges in ``new_body_values`` with this block's body."""
         self.data = merge_dicts(self.data, new_body_values)
         return self
+
+
+class KubernetesObject(Data):
+    KIND = None
+
+    def __init__(self, data=None, kind=None):
+        super().__init__(data=data)
+
+        if kind is not None:
+            self.kind = kind
+        elif self.KIND is not None:
+            self.kind = self.KIND
 
     @property
     def kind(self):

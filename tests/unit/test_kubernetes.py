@@ -4,14 +4,11 @@ from collections import OrderedDict
 import shutil
 
 
-def test_service1():
-    rendered = k8s.Service({}).render()
-    assert rendered['kind'] == 'Service'
-
-
-def test_service2():
-    rendered = k8s.Service().render()
-    assert rendered['kind'] == 'Service'
+@pytest.mark.parametrize('klass,kind', [(k8s.Service, 'Service'),
+                                        (k8s.Deployment, 'Deployment')])
+def test_render_with_kind(klass, kind):
+    rendered = klass({}).render()
+    assert rendered['kind'] == kind
 
 
 def test_single_from_yaml():
@@ -20,7 +17,8 @@ apiVersion: v1
 kind: Service
     """)
     assert isinstance(service, k8s.Service)
-    assert service.data == OrderedDict([('apiVersion', 'v1'), ('kind', 'Service')])
+    assert service.data == OrderedDict([('apiVersion', 'v1'),
+                                        ('kind', 'Service')])
 
 
 def test_multiple_from_yaml():
@@ -56,9 +54,8 @@ data: {}
 
 
 def test_recursive_render():
-    o = k8s.KubernetesObject(data=[
-        [k8s.KubernetesObject(data=4)],
-        {'foo': k8s.KubernetesObject(data='bar')}])
+    o = k8s.Data(data=[[k8s.Data(data=4)],
+                       {'foo': k8s.Data(data='bar')}])
     assert [[4], {'foo': 'bar'}] == o.render()
 
 
@@ -98,7 +95,7 @@ def test_properties2():
     })
     assert o.apiVersion == 'v1'
     assert o.metadata == {'name': 'foobar'}
-    assert o.spec == True
+    assert o.spec is True
 
 
 def test_create_output_dir(fixtures_dir):
