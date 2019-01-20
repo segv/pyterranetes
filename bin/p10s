@@ -4,6 +4,7 @@ from pprint import pprint  # noqa: F401
 
 from p10s.generator import Generator
 from p10s.watcher import Watcher
+from p10s.__version__ import __version__
 
 
 class AliasedGroup(click.Group):
@@ -21,6 +22,7 @@ class AliasedGroup(click.Group):
 
 
 @click.group(cls=AliasedGroup)
+@click.version_option(__version__)
 def cli():
     pass
 
@@ -41,6 +43,11 @@ def watch(directory, ignore_dotfiles):
     watcher = Watcher(directory, ignore_dotfiles)
     watcher.install_signal_handlers()
     watcher.watch()
+
+
+@cli.command()
+def version():
+    print("p10s, v%s" % __version__)
 
 
 if __name__ == '__main__':
