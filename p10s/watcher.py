@@ -4,8 +4,8 @@ import traceback
 import time
 import signal
 from watchdog.observers import Observer
-
-from p10s.generator import Generator
+import subprocess
+import __main__ as main
 
 
 class PyterranetesEventHandler(FileSystemEventHandler):
@@ -19,11 +19,8 @@ class PyterranetesEventHandler(FileSystemEventHandler):
             return False
         if path.name.endswith(".p10s"):
             print(*message)
-            try:
-                Generator().generate(filename)
-            except Exception:
-                traceback.print_exc()
-                return
+            res = subprocess.run(["python", main.__file__, "generate", filename])
+            return res.returncode == 0, res
 
     def dispatch(self, event):
         if event.is_directory:
