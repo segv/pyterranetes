@@ -160,9 +160,12 @@ class Context(BaseContext):
         """
         return deepcopy(self).add(block)
 
+    def _render_data(self):
+        return self.data
+
     def render(self):
         with self._output_stream() as tf_json:
-            tf_json.write(json.dumps(self.data, indent=4, sort_keys=True))
+            tf_json.write(json.dumps(self._render_data(), indent=4, sort_keys=True))
 
 
 class DuplicateBlockError(ValueError):

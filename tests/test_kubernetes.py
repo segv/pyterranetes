@@ -42,6 +42,13 @@ def test_can_not_add_to_context():
         c += k8s.Service
 
 
+def test_add_data_to_context():
+    c = k8s.Context()
+    c += k8s.Data(dict(foo="bar"))
+
+    assert [{'foo': 'bar'}] == c._render_data()
+
+
 def test_add_to_body():
     map = k8s.from_yaml("""
 kind: ConfigMap
