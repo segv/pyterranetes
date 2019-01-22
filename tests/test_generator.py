@@ -1,7 +1,7 @@
 import pytest
 import json
 import os
-from p10s.generator import Generator, P10SScript, _global_state
+from p10s.generator import Generator, P10SScript, _global_state, ScriptNotFound
 import sys
 from copy import deepcopy
 
@@ -14,6 +14,11 @@ def test_find_p10s_files(fixtures_dir):
     expected = [top, bottom]
     actual = list(Generator()._p10s_scripts(base))
     assert expected == actual
+
+
+def test_find_p10s_script_does_not_exist(fixtures_dir):
+    with pytest.raises(ScriptNotFound):
+        list(Generator()._p10s_scripts(fixtures_dir / 'does_not_exist.p10s'))
 
 
 def test_find_pyterranetes_dir_as_sibling(fixtures_dir):
@@ -149,3 +154,30 @@ def test_pwd(fixtures_dir):
     assert {'data':
             {'bar':
              {'foo': {'pwd': str(input.parent.resolve())}}}} == output_data
+
+
+def test_register_context(fixtures_dir):
+    input = fixtures_dir / 'generator_data' / 'register_context' / 'test.p10s'
+    g = Generator()
+    g.generate(input)
+
+    s = fixtures_dir / 'generator_data' / 'register_context' / 'test.tf.json'
+    s2 = fixtures_dir / 'generator_data' / 'register_context' / 'static_2.tf.json'
+    da = fixtures_dir / 'generator_data' / 'register_context' / 'dynamic_a.tf.json'
+    db = fixtures_dir / 'generator_data' / 'register_context' / 'dynamic_b.tf.json'
+    dc = fixtures_dir / 'generator_data' / 'register_context' / 'dynamic_c.tf.json'
+
+    assert s.exists()
+    assert {'module': {'static': {'var': 's'}}} == json.load(s.open())
+
+    assert s2.exists()
+    assert {'module': {'static_2': {'var': 's2'}}} == json.load(s2.open())
+
+    assert da.exists()
+    assert {'module': {'dynamic_a': {}}} == json.load(da.open())
+
+    assert db.exists()
+    assert {'module': {'dynamic_b': {}}} == json.load(db.open())
+
+    assert dc.exists()
+    assert {'module': {'dynamic_c': {}}} == json.load(dc.open())

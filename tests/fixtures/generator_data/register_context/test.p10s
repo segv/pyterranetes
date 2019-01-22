@@ -1,0 +1,13 @@
+# -*- python -*-
+from p10s import tf, register_context
+
+c1 = tf.Context()
+c1 += tf.from_hcl('module "static" { var = "s" }')
+
+c2 = tf.Context(output="./static_2.tf.json")
+c2 += tf.from_hcl('module "static_2" { var = "s2" }')
+
+for i in ["a", "b", "c"]:
+    context = tf.Context(output="./dynamic_%s.tf.json" % i)
+    context += tf.Module("dynamic_%s" % i)
+    register_context(context)
