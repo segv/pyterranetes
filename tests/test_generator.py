@@ -1,7 +1,7 @@
 import pytest
 import json
 import os
-from p10s.generator import Generator, P10SScript, _global_state, ScriptNotFound
+from p10s.generator import Generator, P10SScript, _global_state
 import sys
 from copy import deepcopy
 
@@ -17,7 +17,7 @@ def test_find_p10s_files(fixtures_dir):
 
 
 def test_find_p10s_script_does_not_exist(fixtures_dir):
-    with pytest.raises(ScriptNotFound):
+    with pytest.raises(FileNotFoundError):
         list(Generator()._p10s_scripts(fixtures_dir / 'does_not_exist.p10s'))
 
 

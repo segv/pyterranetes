@@ -72,15 +72,11 @@ class P10SScript():
             count += 1
 
 
-class ScriptNotFound(Exception):
-    pass
-
-
 class Generator():
 
     def _p10s_scripts(self, root):
         if not root.exists():
-            raise ScriptNotFound("%s does not exist." % str(root))
+            raise FileNotFoundError("%s does not exist." % str(root))
         if root.is_file():
             yield root
         else:
