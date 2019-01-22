@@ -5,7 +5,6 @@ import runpy
 import copy
 from contextlib import contextmanager
 
-
 from p10s.base import BaseContext
 from p10s.values import values
 
@@ -21,6 +20,13 @@ def _global_state(dir, extra_sys_paths):
     finally:
         os.chdir(here)
         sys.path = sys_path
+
+
+CONTEXTS = []
+
+
+def register_context(context):
+    CONTEXTS.append(context)
 
 
 class P10SScript():
@@ -41,10 +47,12 @@ class P10SScript():
         with values({'p10s': {'file': self.filename}}):
             with _global_state(dir=self.base_dir,
                                extra_sys_paths=[self.pyterranetes_dir]):
+                CONTEXTS.clear()
                 globals = runpy.run_path(str(self.filename))
                 for value in globals.values():
                     if isinstance(value, BaseContext):
                         self.contexts.append(value)
+                self.contexts.extend(CONTEXTS)
         return self
 
     def _find_pyterranetes_dir(self, root):
@@ -64,9 +72,15 @@ class P10SScript():
             count += 1
 
 
+class ScriptNotFound(Exception):
+    pass
+
+
 class Generator():
 
     def _p10s_scripts(self, root):
+        if not root.exists():
+            raise ScriptNotFound("%s does not exist." % str(root))
         if root.is_file():
             yield root
         else:
