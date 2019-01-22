@@ -83,7 +83,7 @@ Really is just a YAML context.
         else:
             objects = object
         for o in objects:
-            if isinstance(o, KubernetesObject):
+            if isinstance(o, Data):
                 self.data.append(o)
             else:
                 raise Exception("Can't add %s to %s, is not of type KubernetesObject", o, self)
@@ -98,10 +98,12 @@ Really is just a YAML context.
                       data=deepcopy(self.data))
         return new.add(block)
 
+    def _render_data(self):
+        return [data.render() for data in self.data]
+
     def render(self):
         with self._output_stream() as out:
-            ruamel.dump_all([data.render() for data in self.data],
-                            out)
+            ruamel.dump_all(self._render_data(), out)
 
 
 class Data():
