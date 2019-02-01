@@ -20,6 +20,7 @@ class PyterranetesEventHandler(FileSystemEventHandler):
         if path.name.endswith(".p10s"):
             print(*message)
             res = subprocess.run(["python", main.__file__, "generate", filename])
+            print("Done.")
             return res.returncode == 0, res
 
     def dispatch(self, event):
@@ -29,16 +30,13 @@ class PyterranetesEventHandler(FileSystemEventHandler):
             super().dispatch(event)
 
     def on_created(self, event):
-        self._maybe_generate(event.src_path,
-                             "%s created. building." % event.src_path)
+        self._maybe_generate(event.src_path, "%s created. building." % event.src_path)
 
     def on_modified(self, event):
-        self._maybe_generate(event.src_path,
-                             "%s modified, rebuilding" % event.src_path)
+        self._maybe_generate(event.src_path, "%s modified, rebuilding" % event.src_path)
 
     def on_moved(self, event):
-        self._maybe_generate(event.dest_path,
-                             "%s moved, rebuilding at %s" % (event.src_path, event.dest_path))
+        self._maybe_generate(event.dest_path, "%s moved, rebuilding at %s" % (event.src_path, event.dest_path))
 
 
 class Watcher():
