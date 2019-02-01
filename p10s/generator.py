@@ -86,8 +86,13 @@ class Generator():
                     if path.suffix == '.p10s':
                         yield Path(os.path.join(dirname, file))
 
-    def generate(self, root):
+    def generate(self, root, verbose=True):
         root = Path(root).resolve()
         scripts = [P10SScript(filename=filename) for filename in self._p10s_scripts(root)]
         for script in scripts:
-            script.compile().render()
+            try:
+                script.compile().render()
+            except Exception as e:
+                if verbose:
+                    print("Error while generating %s" % script.filename)
+                raise e
