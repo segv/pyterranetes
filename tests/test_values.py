@@ -1,10 +1,27 @@
 import pytest
+import os
 from p10s.values import Values, values, value, set_value
 
 
-def test_values_invalid_basedir(fixtures_dir):
-    with pytest.raises(Exception):
+def test_values_inexistent_basedir(fixtures_dir):
+    with pytest.raises(FileNotFoundError):
         Values.from_files(fixtures_dir / 'values_data' / 'top' / 'does-not-exist')
+
+
+# next two to check an infinte recursion bug in the from_files method
+@pytest.mark.timeout(5)  # 5 seconds is a _very_ generous timeframe to walk up a few directories
+def test_values_basedir_infinite_loop_1():
+    Values.from_files(".")
+
+
+@pytest.mark.timeout(5)
+def test_values_basedir_infinite_loop_2(fixtures_dir):
+    start = os.getcwd()
+    os.chdir(str(fixtures_dir))
+    try:
+        Values.from_files("./values_data")
+    finally:
+        os.chdir(start)
 
 
 def test_values(fixtures_dir):
