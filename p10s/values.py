@@ -44,16 +44,21 @@ basedir will over ride values specified in a higher up values file.
         """
         basedir = Path(basedir)
         if not basedir.exists():
-            raise Exception("basedir {} does not exist" % basedir)
-        root = basedir.resolve().root
+            raise FileNotFoundError("basedir %s does not exist" % basedir)
         here = basedir
 
         values_files = []
 
-        while str(here) != root:
+        if basedir.is_file():
+            basedir = basedir.parent()
+
+        while True:
             if (here / 'values.yaml').exists():
                 values_files.insert(0, here / 'values.yaml')
-            here = here.parent
+            if here == here.parent:
+                break
+            else:
+                here = here.parent
 
         values = {}
         for file in values_files:
