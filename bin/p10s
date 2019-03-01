@@ -29,20 +29,22 @@ def cli():
 
 @cli.command()
 @click.argument('filename', nargs=-1)
-def generate(filename):
+@click.option('-v', '--verbose', type=bool, default=False, is_flag=True)
+def generate(filename, verbose):
     if len(filename) == 0:
         filename = ['.']
     for f in filename:
-        Generator().generate(f)
+        Generator().generate(f, verbose=verbose)
 
 
 @cli.command()
 @click.option('--ignore-dotfiles', type=bool, default=True)
+@click.option('-v', '--verbose', type=bool, default=False, is_flag=True)
 @click.argument('directory', nargs=1, default='.')
-def watch(directory, ignore_dotfiles):
+def watch(directory, ignore_dotfiles, verbose):
     watcher = Watcher(directory, ignore_dotfiles)
     watcher.install_signal_handlers()
-    watcher.watch()
+    watcher.watch(verbose=bool(verbose))
 
 
 @cli.command()
