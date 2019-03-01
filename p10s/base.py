@@ -22,3 +22,6 @@ class BaseContext():
     def _output_stream(self):
         self.output.parent.mkdir(parents=True, exist_ok=True)
         return self.output.open("w")
+
+    def __repr__(self):
+        return "<" + self.__module__ + "." + self.__class__.__name__ + ">"

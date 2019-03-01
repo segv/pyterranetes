@@ -4,6 +4,7 @@ from pathlib import Path
 import runpy
 import copy
 from contextlib import contextmanager
+from pprint import pformat
 
 from p10s.base import BaseContext
 from p10s.values import values
@@ -29,6 +30,10 @@ def register_context(context):
     CONTEXTS.append(context)
 
 
+def _stderr(*args):
+    print(*args, file=sys.stderr)
+
+
 class P10SScript():
     def __init__(self, filename):
         self.filename = filename
@@ -36,14 +41,18 @@ class P10SScript():
         self.contexts = []
         self.pyterranetes_dir = self._find_pyterranetes_dir(filename.parent)
 
-    def render(self):
+    def render(self, verbose=False):
         for c in self.contexts:
             with _global_state(dir=self.base_dir,
                                extra_sys_paths=[self.pyterranetes_dir]):
+                if verbose:
+                    _stderr("  Rendering", pformat(c), "to", c.output, "in", self.base_dir)
                 c.render()
         return self
 
-    def compile(self):
+    def compile(self, verbose=False):
+        if verbose:
+            _stderr("Compiling", self.filename)
         with values({'p10s': {'file': self.filename}}):
             with _global_state(dir=self.base_dir,
                                extra_sys_paths=[self.pyterranetes_dir]):
@@ -86,13 +95,13 @@ class Generator():
                     if path.suffix == '.p10s':
                         yield Path(os.path.join(dirname, file))
 
-    def generate(self, root, verbose=True):
+    def generate(self, root, verbose=False):
         root = Path(root).resolve()
         scripts = [P10SScript(filename=filename) for filename in self._p10s_scripts(root)]
         for script in scripts:
             try:
-                script.compile().render()
+                script.compile(verbose=verbose).render(verbose=verbose)
             except Exception as e:
                 if verbose:
-                    print("Error while generating %s" % script.filename)
+                    _stderr("Error while generating %s", script.filename)
                 raise e

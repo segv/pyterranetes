@@ -1,6 +1,5 @@
 from pathlib import Path
 from watchdog.events import FileSystemEventHandler
-import traceback
 import time
 import signal
 from watchdog.observers import Observer
@@ -9,9 +8,10 @@ import __main__ as main
 
 
 class PyterranetesEventHandler(FileSystemEventHandler):
-    def __init__(self, ignore_dotfiles):
+    def __init__(self, ignore_dotfiles, verbose=False):
         super().__init__()
         self.ignore_dotfiles = ignore_dotfiles
+        self.verbose = verbose
 
     def _maybe_generate(self, filename, *message):
         path = Path(filename)
@@ -19,7 +19,7 @@ class PyterranetesEventHandler(FileSystemEventHandler):
             return False
         if path.name.endswith(".p10s"):
             print(*message)
-            res = subprocess.run(["python", main.__file__, "generate", filename])
+            res = subprocess.run(["python", main.__file__, "generate", "-v" if self.verbose else "", filename])
             print("Done.")
             return res.returncode == 0, res
 
@@ -46,14 +46,16 @@ class Watcher():
         self.run = True
         self.observer = Observer()
 
-    def watch(self):
+    def watch(self, verbose=False):
+        if verbose:
+            print("Watching for changes in", self.directory, "and below.")
         dirname = str(Path(self.directory).resolve())
-        self.observer.schedule(PyterranetesEventHandler(ignore_dotfiles=self.ignore_dotfiles),
+        self.observer.schedule(PyterranetesEventHandler(ignore_dotfiles=self.ignore_dotfiles, verbose=verbose),
                                dirname,
                                recursive=True)
         self.observer.start()
         while self.run:
-            time.sleep(1)
+            time.sleep(0.2)
         self.observer.join()
 
     def install_signal_handlers(self):
