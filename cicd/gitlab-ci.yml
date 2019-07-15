@@ -1,39 +1,46 @@
 # -*- yaml -*-
 
-before_script:
-  - pip install -q -r requirements_dev.txt
+image: python:3.7
 
-variables:
-  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+before_script:
+  - pip install -q ply
+  - pip install -q -r requirements_dev.txt
 
 stages: [ test-python, test-docs, deploy ]
 
-test:py35: &test-python
+test:py37: &test-python
   stage: test-python
-  image: python:3.5
-  script: [ tox -e py35 ]
+  script: [ tox -e py37 ]
   coverage: '/^TOTAL.*\s(\d+)%\s*$/'
 
 test:py36:
-  <<: *test-python
+  stage: test-python
   image: python:3.6
   script: [ tox -e py36 ]
 
-test:py37:
-  <<: *test-python
-  image: python:3.7
-  script: [ tox -e py37 ]
+test:py35:
+  stage: test-python
+  image: python:3.5
+  script: [ tox -e py35 ]
 
-test:build-docs: &make-docs
+test:build-docs:
   stage: test-docs
-  image: python:3.7
   script:
-    - pip3 install --upgrade --force-reinstall -e .
+    - pip install --quiet --upgrade --force-reinstall -e .
     - sphinx-build -W ./docs ./public
 
 pages:
-  <<: *make-docs
   stage: deploy
+  script:
+    - pip install --quiet --upgrade --force-reinstall -e .
+    - sphinx-build -W ./docs ./public
   artifacts:
     paths: [ ./public ]
   only: [ master ]
+
+pypi:
+  stage: deploy
+  only: [ master ]
+  script:
+    - ./cicd/upload
+

@@ -6,3 +6,4 @@ pytest-timeout
 sphinx
 tox
 tox-pyenv
+twine

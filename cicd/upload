@@ -1,0 +1,6 @@
+#!/bin/bash
+set -euo pipefail
+
+env TWINE_USERNAME=${TWINE_USERNAME:-segv} \
+    TWINE_PASSWORD=${TWINE_PASSWORD:-$(pass segv@pypi.org)} \
+  python setup.py upload
