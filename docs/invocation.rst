@@ -25,3 +25,20 @@ p10s modified or created in a particular dir:
     ^C
     $
 
+Very (very) often we want to run `terraform` or `kubectl` after having
+run p10s, so these two CLIs have convenience commands in p10s allowing
+one to do this:
+
+.. code-block:: bash
+
+    $ p10s terraform plan
+
+
+which will first run `generate` in the current directory and then call
+`terraform plan`, instead of this:
+
+.. code-block:: bash
+
+    $ p10s generate && terraform plan
+
+There is an analogous short cut for `kubectl`.  instead of this:

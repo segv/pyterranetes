@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import click
 from pprint import pprint  # noqa: F401
+import subprocess
 
 from p10s.generator import Generator
 from p10s.watcher import Watcher
@@ -8,10 +9,21 @@ from p10s.__version__ import __version__
 
 
 class AliasedGroup(click.Group):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.alias_mapping = {}
+
+    def add_mapping(self, frm, to):
+        self.alias_mapping[frm] = to
+
     def get_command(self, ctx, cmd_name):
         rv = click.Group.get_command(self, ctx, cmd_name)
         if rv is not None:
             return rv
+
+        if cmd_name in self.alias_mapping:
+            return click.Group.get_command(self, ctx, self.alias_mapping[cmd_name])
+
         matches = [x for x in self.list_commands(ctx)
                    if x.startswith(cmd_name)]
         if not matches:
@@ -45,6 +57,28 @@ def watch(directory, ignore_dotfiles, verbose):
     watcher = Watcher(directory, ignore_dotfiles)
     watcher.install_signal_handlers()
     watcher.watch(verbose=bool(verbose))
+
+
+@cli.command()
+@click.option('--terraform', type=str, default='terraform', envvar='PYTERRANETES_TERRAFORM')
+@click.argument('command', nargs=-1)
+def terraform(terraform, command):
+    Generator().generate(".")
+    subprocess.call(" ".join([terraform] + list(command)), shell=True)
+
+
+cli.add_mapping("tf", "terraform")
+
+
+@cli.command()
+@click.option('--kubectl', type=str, default='terraform', envvar='PYTERRANETES_KUBECTL')
+@click.argument('command', nargs=-1)
+def kubectl(kubectl, command):
+    Generator().generate(".")
+    subprocess.call(" ".join([kubectl] + list(command)), shell=True)
+
+
+cli.add_mapping("kubectl", "k8s")
 
 
 @cli.command()
