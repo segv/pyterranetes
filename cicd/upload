@@ -1,6 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
+pip install twine
 env TWINE_USERNAME=${TWINE_USERNAME:-segv} \
     TWINE_PASSWORD=${TWINE_PASSWORD:-$(pass segv@pypi.org)} \
   python setup.py upload

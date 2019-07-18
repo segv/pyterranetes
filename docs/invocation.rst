@@ -41,4 +41,4 @@ which will first run `generate` in the current directory and then call
 
     $ p10s generate && terraform plan
 
-There is an analogous short cut for `kubectl`.  instead of this:
+There is an analogous short cut for `kubectl`.

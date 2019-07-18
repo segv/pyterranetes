@@ -6,22 +6,25 @@
 pyterranetes
 ============
 
+What is it?
+-----------
+
 ``pyterranetes`` is a tool for managing the data files for terraform
 and kubernetes/helm (or any other yaml or hcl based tools).
 
-``pyterranetes`` has a different approach than most terranetes and k8s tools:
+``pyterranetes`` integrates cleanly into existing terraform and k8s
+code bases, it can be used as much, or as little, as needed.
 
-this is not a text based templating engine. instead you write python
-code which creates plain python objects (dicts, list, strings,
-numbers, etc.), these python objects are then serialized to proper
-format (yaml, terraform json, etc.). 
+Since ``pyterranetes`` is just python, and since it knows how to
+generate both terraform configs and kubernetes yaml, it makes it easy
+to share code and values across both tools.
 
-Features:
-
-- integrates cleanly into existing terraform and k8s code bases, it
-  can be used as much, or as little, as needed.
-- makes it easy to share code, conventions and values across both
-  terraform and k8s.
+``pyterranetes`` has a different approach than most terranetes and k8s
+wrappers: in particular ``pyterranetes`` is not a text based
+templating engine. instead you write python code which creates plain
+python objects (dicts, list, strings, numbers, etc.), these python
+objects are then serialized to proper format (yaml, terraform json,
+etc.).
 
 .. toctree::
    :hidden:
@@ -35,5 +38,4 @@ Features:
    terraform
    kubernetes
    utilities
-   indices
-   
+   appendix
