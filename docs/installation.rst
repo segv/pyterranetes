@@ -8,4 +8,5 @@ installation is via pip:
 
 .. code-block:: bash
 
-    $ pip install --upgrade git+https://gitlab.com/sig11/pyterranetes
+    $ pip install pyterranetes
+
