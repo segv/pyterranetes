@@ -213,7 +213,10 @@ class TerraformBlock():
         raise NotImplementedError()  # pragma: no cover
 
     def __eq__(self, other):
-        return self.__dict__ == other.__dict__
+        if isinstance(other, TerraformBlock):
+            return self.__dict__ == other.__dict__
+        else:
+            return super().__eq__(other)
 
 
 class NoArgsBlock(TerraformBlock):
