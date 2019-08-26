@@ -31,7 +31,7 @@ one to do this:
 
 .. code-block:: bash
 
-    $ p10s terraform plan
+    $ p10s tf plan
 
 
 which will first run `generate` in the current directory and then call
@@ -39,6 +39,15 @@ which will first run `generate` in the current directory and then call
 
 .. code-block:: bash
 
-    $ p10s generate && terraform plan
+    $ p10s generate . && terraform plan
 
-There is an analogous short cut for `kubectl`.
+Note: As `p10s` has its own argument parsing logic if you want to pass
+an option to terraform (like `-target` or `-var`) you'll need to
+explicitly tell p10s when its arguments end:
+
+.. code-block:: bash
+
+    $ p10s tf plan -- -target=module.foo
+
+
+There is an analogous short cut for `kubectl` (aliased to `k8s`).
