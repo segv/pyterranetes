@@ -31,7 +31,7 @@ class LoopExhausted(Exception):
 
 
 def wait_until(condition):
-    for i in range(30):
+    for i in range(300):
         v = condition()
         if v:
             return v
