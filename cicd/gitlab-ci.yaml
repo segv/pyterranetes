@@ -2,7 +2,13 @@
 
 image: python:3.7
 
-stages: [ test-python, test-docs, deploy ]
+stages: [ lint, test-python, test-docs, deploy ]
+
+lint:
+  stage: lint
+  script:
+    - pip install --quiet --requirement requirements_dev.txt
+    - ./cicd/lint
 
 test:py37:
   stage: test-python
@@ -45,4 +51,3 @@ pypi:
   script:
     - ./cicd/upload
   only: [ master ]
-
