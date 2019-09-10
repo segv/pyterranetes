@@ -58,7 +58,7 @@ will be able to properly parse it.
 from copy import deepcopy
 
 from p10s.base import BaseContext
-from p10s.loads import yaml, yaml_all, ruamel
+from p10s.loads import ruamel, yaml, yaml_all
 from p10s.utils import merge_dicts
 
 
@@ -67,7 +67,8 @@ class Context(BaseContext):
 
 Really is just a YAML context.
 """
-    output_file_extension = '.yaml'
+
+    output_file_extension = ".yaml"
 
     def __init__(self, *args, data=None, **kwargs):
         if data is None:
@@ -86,16 +87,16 @@ Really is just a YAML context.
             if isinstance(o, Data):
                 self.data.append(o)
             else:
-                raise Exception("Can't add %s to %s, is not of type KubernetesObject", o, self)
+                raise Exception(
+                    "Can't add %s to %s, is not of type KubernetesObject", o, self
+                )
         return self
 
     def __iadd__(self, object):
         return self.add(object)
 
     def __add__(self, block):
-        new = Context(input=self.input,
-                      output=self.output,
-                      data=deepcopy(self.data))
+        new = Context(input=self.input, output=self.output, data=deepcopy(self.data))
         return new.add(block)
 
     def _render_data(self):
@@ -106,7 +107,7 @@ Really is just a YAML context.
             ruamel.dump_all(self._render_data(), out)
 
 
-class Data():
+class Data:
     def __init__(self, data=None):
         if data is None:
             self.data = {}
@@ -150,77 +151,77 @@ class KubernetesObject(Data):
     @property
     def kind(self):
         """Property mapping this object's ``kind`` value"""
-        return self.data.get('kind', None)
+        return self.data.get("kind", None)
 
     @kind.setter
     def kind(self, value):
-        self.data['kind'] = value
+        self.data["kind"] = value
 
     @property
     def apiVersion(self):
         """Property mapping this object's ``apiVersion`` value"""
-        return self.data.get('apiVersion', None)
+        return self.data.get("apiVersion", None)
 
     @apiVersion.setter
     def apiVersion(self, value):
-        self.data['apiVersion'] = value
+        self.data["apiVersion"] = value
 
     @property
     def metadata(self):
         """Property mapping this object's ``metadata`` value"""
-        return self.data.get('metadata', None)
+        return self.data.get("metadata", None)
 
     @metadata.setter
     def metadata(self, value):
-        self.data['metadata'] = value
+        self.data["metadata"] = value
 
     @property
     def spec(self):
         """Property mapping this object's ``spec`` value"""
-        return self.data.get('spec', None)
+        return self.data.get("spec", None)
 
     @spec.setter
     def spec(self, value):
-        self.data['spec'] = value
+        self.data["spec"] = value
 
 
 class Deployment(KubernetesObject):
-    KIND = 'Deployment'
+    KIND = "Deployment"
 
 
 class ConfigMap(KubernetesObject):
-    KIND = 'ConfigMap'
+    KIND = "ConfigMap"
 
 
 class Service(KubernetesObject):
-    KIND = 'Service'
+    KIND = "Service"
 
 
 class Job(KubernetesObject):
-    KIND = 'Job'
+    KIND = "Job"
 
 
 class StatefulSet(KubernetesObject):
-    KIND = 'StatefulSet'
+    KIND = "StatefulSet"
 
 
 class Ingress(KubernetesObject):
-    KIND = 'Ingress'
+    KIND = "Ingress"
 
 
 class Secret(KubernetesObject):
-    KIND = 'Ingress'
+    KIND = "Ingress"
 
 
 def _data_to_object(data):
-    kind = data.get('kind', None)
+    kind = data.get("kind", None)
     if kind is not None:
         cls = None
-        if kind == 'Deployment':
+        if kind == "Deployment":
             cls = Deployment
-        if kind == 'ConfigMap':
+        if kind == "ConfigMap":
             cls = ConfigMap
-        if kind == 'Service':
+        if kind == "Service":
             cls = Service
         return cls(data=data)
     else:

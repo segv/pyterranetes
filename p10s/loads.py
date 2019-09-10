@@ -16,14 +16,14 @@ want to be using one of the specific object generators instead:
 .. autofunction:: p10s.loads.json
 
 """
-from pathlib import Path
-from ruamel.yaml import YAML
-import hcl as pyhcl
-import json as json_lib
 import io
+import json as json_lib
+from pathlib import Path
 
+import hcl as pyhcl
+from ruamel.yaml import YAML
 
-ruamel = YAML(typ='safe', pure=True)
+ruamel = YAML(typ="safe", pure=True)
 ruamel.default_flow_style = False
 
 
@@ -47,7 +47,7 @@ corresponding python data structure.
         return ruamel.load(_data(input))
     except Exception as e:
         print("Error parsing %s" % input)
-        raise(e)
+        raise (e)
 
 
 def yaml_all(input):
@@ -60,7 +60,7 @@ def yaml_all(input):
         return ruamel.load_all(_data(input))
     except Exception as e:
         print("Error parsing %s" % input)
-        raise(e)
+        raise (e)
 
 
 def hcl(input):
@@ -142,11 +142,11 @@ def json(input):
 def load_file(filename):
     filename = Path(filename)
     suffix = filename.suffix
-    if suffix == '.yaml':
+    if suffix == ".yaml":
         return yaml(filename)
-    elif suffix == '.hcl':
+    elif suffix == ".hcl":
         return hcl(filename)
-    elif suffix == '.json':
+    elif suffix == ".json":
         return json(filename)
     else:
-        raise Exception('Unknown extension {}' % filename)
+        raise Exception("Unknown extension {}" % filename)

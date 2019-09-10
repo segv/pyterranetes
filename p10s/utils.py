@@ -13,6 +13,7 @@ def merge_dicts(*args):
 
 def _merge_dicts(a, b):
     """Copy values from B into A. destructively modifies A."""
+
     def rec(a, b):
         for k in b.keys():
             new = b[k]

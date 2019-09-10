@@ -1,11 +1,12 @@
-from p10s.values import value
 from pathlib import Path
 
+from p10s.values import value
 
-class BaseContext():
+
+class BaseContext:
     def __init__(self, input=None, output=None):
         if input is None:
-            self.input = value('p10s', {}).get('file', None)
+            self.input = value("p10s", {}).get("file", None)
         else:
             self.input = Path(input)
 
