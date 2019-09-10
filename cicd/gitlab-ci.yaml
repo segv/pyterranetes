@@ -2,7 +2,13 @@
 
 image: python:3.7
 
-stages: [ test-python, test-docs, deploy ]
+stages: [ lint, test-python, test-docs, deploy ]
+
+lint:
+  stage: lint
+  script:
+    - pip install --quiet --requirement requirements_dev.txt
+    - ./cicd/lint
 
 test:py37:
   stage: test-python
@@ -22,6 +28,9 @@ test:py35:
   stage: test-python
   image: python:3.5
   script:
+    # black doesn't run on pyhotn 3.5, we're not using it for the
+    # tests anyway, so this is ok.
+    - sed 's/^black$//' -i requirements_dev.txt
     - pip install --quiet --requirement requirements_dev.txt
     - tox -e py35
 
@@ -45,4 +54,3 @@ pypi:
   script:
     - ./cicd/upload
   only: [ master ]
-

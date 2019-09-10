@@ -1,9 +1,9 @@
-import sys
-import os
-from pathlib import Path
-import runpy
 import copy
+import os
+import runpy
+import sys
 from contextlib import contextmanager
+from pathlib import Path
 from pprint import pformat
 
 from p10s.base import BaseContext
@@ -34,7 +34,7 @@ def _stderr(*args):
     print(*args, file=sys.stderr)
 
 
-class P10SScript():
+class P10SScript:
     def __init__(self, filename):
         self.filename = filename
         self.base_dir = filename.parent
@@ -43,19 +43,23 @@ class P10SScript():
 
     def render(self, verbose=False):
         for c in self.contexts:
-            with _global_state(dir=self.base_dir,
-                               extra_sys_paths=[self.pyterranetes_dir]):
+            with _global_state(
+                dir=self.base_dir, extra_sys_paths=[self.pyterranetes_dir]
+            ):
                 if verbose:
-                    _stderr("  Rendering", pformat(c), "to", c.output, "in", self.base_dir)
+                    _stderr(
+                        "  Rendering", pformat(c), "to", c.output, "in", self.base_dir
+                    )
                 c.render()
         return self
 
     def compile(self, verbose=False):
         if verbose:
             _stderr("Compiling", self.filename)
-        with values({'p10s': {'file': self.filename}}):
-            with _global_state(dir=self.base_dir,
-                               extra_sys_paths=[self.pyterranetes_dir]):
+        with values({"p10s": {"file": self.filename}}):
+            with _global_state(
+                dir=self.base_dir, extra_sys_paths=[self.pyterranetes_dir]
+            ):
                 CONTEXTS.clear()
                 globals = runpy.run_path(str(self.filename))
                 for value in globals.values():
@@ -68,7 +72,7 @@ class P10SScript():
         here = root
         count = 0
         while True:
-            maybe = here / 'pyterranetes'
+            maybe = here / "pyterranetes"
             if maybe.exists() and maybe.is_dir():
                 return maybe
                 break
@@ -81,8 +85,7 @@ class P10SScript():
             count += 1
 
 
-class Generator():
-
+class Generator:
     def _p10s_scripts(self, root):
         if not root.exists():
             raise FileNotFoundError("%s does not exist." % str(root))
@@ -92,12 +95,14 @@ class Generator():
             for dirname, sub_dirs, files in os.walk(str(root)):
                 for file in files:
                     path = Path(file)
-                    if path.suffix == '.p10s':
+                    if path.suffix == ".p10s":
                         yield Path(os.path.join(dirname, file))
 
     def generate(self, root, verbose=False):
         root = Path(root).resolve()
-        scripts = [P10SScript(filename=filename) for filename in self._p10s_scripts(root)]
+        scripts = [
+            P10SScript(filename=filename) for filename in self._p10s_scripts(root)
+        ]
         for script in scripts:
             try:
                 script.compile(verbose=verbose).render(verbose=verbose)

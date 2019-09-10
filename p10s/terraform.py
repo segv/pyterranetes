@@ -84,14 +84,14 @@ corresponsding block. As pyterranetes only actually generates
 in the output.
 """
 
+import collections.abc
 import json
 from copy import deepcopy
-import collections.abc
+from pprint import pformat
 
+from p10s.base import BaseContext
 from p10s.loads import hcl
 from p10s.utils import merge_dicts
-from p10s.base import BaseContext
-from pprint import pformat
 
 
 class Context(BaseContext):
@@ -107,7 +107,8 @@ class Context(BaseContext):
     to the Context constructor.
 
     """
-    output_file_extension = '.tf.json'
+
+    output_file_extension = ".tf.json"
 
     def __init__(self, *args, data=None, strict=False, **kwargs):
         if data is None:
@@ -174,13 +175,14 @@ class DuplicateBlockError(ValueError):
         self.new_block = new_block
 
 
-class TerraformBlock():
+class TerraformBlock:
     """Abstract base class for all terrform blocks.
 
     Exposes the :py:meth:`.body <p10s.terrform.TerraformBlock.body>`
     property for direct manipulation of the block's data.
 
     """
+
     def __init__(self, data=None):
         if data is not None:
             self.data = data
@@ -221,9 +223,7 @@ class TerraformBlock():
 
 class NoArgsBlock(TerraformBlock):
     def __init__(self, body):
-        super().__init__({
-            self.KIND: body or {}
-        })
+        super().__init__({self.KIND: body or {}})
 
     def _body(self):
         return self.data[self.KIND]
@@ -238,11 +238,7 @@ class NoArgsBlock(TerraformBlock):
 class NameBlock(TerraformBlock):
     def __init__(self, name, body=None):
         self._name = name
-        super().__init__({
-            self.KIND: {
-                name: body or {}
-            }
-        })
+        super().__init__({self.KIND: {name: body or {}}})
 
     def _body(self):
         return self.data[self.KIND][self.name]
@@ -269,13 +265,7 @@ class TypeNameBlock(TerraformBlock):
     def __init__(self, type, name, body=None):
         self._type = type
         self._name = name
-        super().__init__({
-            self.KIND: {
-                type: {
-                    name: body or {}
-                }
-            }
-        })
+        super().__init__({self.KIND: {type: {name: body or {}}}})
 
     def _body(self):
         return self.data[self.KIND][self._type][self._name]
@@ -296,7 +286,9 @@ class TypeNameBlock(TerraformBlock):
 
     @name.setter
     def name(self, name):
-        self.data[self.KIND][self._type][name] = self.data[self.KIND][self._type][self.name]
+        self.data[self.KIND][self._type][name] = self.data[self.KIND][self._type][
+            self.name
+        ]
         del self.data[self.KIND][self._type][self._name]
         self._name = name
 
@@ -309,12 +301,14 @@ class TypeNameBlock(TerraformBlock):
 
 class Terraform(NoArgsBlock):
     """``terraform`` block. Doesn't expose any properties beyond ``body``."""
-    KIND = 'terraform'
+
+    KIND = "terraform"
 
 
 class Locals(NoArgsBlock):
     """``locals`` block. Doesn't expose any properties beyond ``body``."""
-    KIND = 'locals'
+
+    KIND = "locals"
 
 
 class Variable(NameBlock):
@@ -325,10 +319,11 @@ class Variable(NameBlock):
     :func:`variables <p10s.terraform.variables>`.
 
     """
-    KIND = 'variable'
+
+    KIND = "variable"
 
     def __repr__(self):
-        return "#<%s %s %s>" % (self.KIND, self.name, self.body.get('default', None))
+        return "#<%s %s %s>" % (self.KIND, self.name, self.body.get("default", None))
 
 
 def variables(**kwargs):
@@ -352,7 +347,9 @@ def variables(**kwargs):
       c += tf.Variable("other", {'default': 'other value'})
 
     """
-    return [Variable(name=name, body={'default': kwargs[name]}) for name in kwargs.keys()]
+    return [
+        Variable(name=name, body={"default": kwargs[name]}) for name in kwargs.keys()
+    ]
 
 
 class Output(NameBlock):
@@ -382,22 +379,23 @@ class Output(NameBlock):
     <p10s.terraform.outputs>`
 
     """
-    KIND = 'output'
+
+    KIND = "output"
 
     def __init__(self, name=None, body=None, **kwargs):
         if name is None and body is None:
             keys = list(kwargs.keys())
             if len(keys) != 1:
-                raise Exception("Output's dwim constructor expects exactly one arg, not %s", kwargs)
+                raise Exception(
+                    "Output's dwim constructor expects exactly one arg, not %s", kwargs
+                )
             name = keys[0]
-            body = {
-                'value': kwargs[name]
-            }
+            body = {"value": kwargs[name]}
 
         super().__init__(name=name, body=body)
 
     def __repr__(self):
-        return "#<%s %s %s>" % (self.KIND, self.name, self.body.get('value', None))
+        return "#<%s %s %s>" % (self.KIND, self.name, self.body.get("value", None))
 
 
 def outputs(**kwargs):
@@ -420,27 +418,31 @@ def outputs(**kwargs):
 
 
     """
-    return [Output(name=name, body={'value': kwargs[name]}) for name in kwargs.keys()]
+    return [Output(name=name, body={"value": kwargs[name]}) for name in kwargs.keys()]
 
 
 class Module(NameBlock):
     """``module`` block. Exposes `.name` as a property."""
-    KIND = 'module'
+
+    KIND = "module"
 
 
 class Provider(NameBlock):
     """``provider`` block. Exposes `.name` as a property."""
-    KIND = 'provider'
+
+    KIND = "provider"
 
 
 class Resource(TypeNameBlock):
     """``resource`` block. Exposes `.name` and `.type` as properties."""
-    KIND = 'resource'
+
+    KIND = "resource"
 
 
 class Data(TypeNameBlock):
     """``data`` block. Exposes `.name` and `.type` as properties."""
-    KIND = 'data'
+
+    KIND = "data"
 
 
 class HCLParseError(Exception):
@@ -476,29 +478,31 @@ def many_from_hcl(hcl_string):
     blocks = []
 
     for kind in data.keys():
-        if kind == 'terraform':
+        if kind == "terraform":
             blocks.append(Terraform(body=data[kind]))
-        elif kind == 'locals':
+        elif kind == "locals":
             blocks.append(Locals(body=data[kind]))
-        elif kind in ('variable', 'output', 'locals', 'module', 'provider'):
+        elif kind in ("variable", "output", "locals", "module", "provider"):
             for name in data[kind].keys():
-                if kind == 'variable':
+                if kind == "variable":
                     cls = Variable
-                if kind == 'output':
+                if kind == "output":
                     cls = Output
-                if kind == 'module':
+                if kind == "module":
                     cls = Module
-                if kind == 'provider':
+                if kind == "provider":
                     cls = Provider
                 blocks.append(cls(name=name, body=data[kind][name]))
-        elif kind in ('resource', 'data'):
+        elif kind in ("resource", "data"):
             for type in data[kind].keys():
                 for name in data[kind][type]:
-                    if kind == 'resource':
+                    if kind == "resource":
                         cls = Resource
-                    if kind == 'data':
+                    if kind == "data":
                         cls = Data
-                    blocks.append(cls(type=type, name=name, body=data[kind][type][name]))
+                    blocks.append(
+                        cls(type=type, name=name, body=data[kind][type][name])
+                    )
         else:
             raise HCLUnknownBlockError(kind=kind)
 
@@ -549,5 +553,7 @@ def from_hcl(hcl_string):
     if len(blocks) == 1:
         return blocks[0]
     else:
-        raise Exception("Expected exactly one block when using `from_hcl` but got %s blocks from %s" %
-                        (len(blocks), hcl_string))
+        raise Exception(
+            "Expected exactly one block when using `from_hcl` but got %s blocks from %s"
+            % (len(blocks), hcl_string)
+        )
