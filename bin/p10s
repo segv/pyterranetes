@@ -3,6 +3,7 @@ import click
 from pprint import pprint  # noqa: F401
 import subprocess
 import sys
+import os
 
 from p10s.generator import Generator
 from p10s.watcher import Watcher
@@ -65,7 +66,7 @@ def watch(directory, ignore_dotfiles, verbose):
 @click.argument('command', nargs=-1)
 def terraform(terraform, command):
     Generator().generate(".")
-    subprocess.run(" ".join([terraform] + list(command)), shell=True)
+    os.execvp(terraform, [terraform] + list(command))
 
 
 @cli.command()
@@ -98,12 +99,13 @@ def tf(terraform, command):
 
     raise Exception("Unknown command `%s`" % command)
 
+
 @cli.command()
 @click.option('--kubectl', type=str, default='terraform', envvar='PYTERRANETES_KUBECTL')
 @click.argument('command', nargs=-1)
 def kubectl(kubectl, command):
     Generator().generate(".")
-    subprocess.call(" ".join([kubectl] + list(command)), shell=True)
+    os.execvp(kubectl, [kubectl] + list(command))
 
 
 cli.add_mapping("kubectl", "k8s")
