@@ -28,6 +28,9 @@ test:py35:
   stage: test-python
   image: python:3.5
   script:
+    # black doesn't run on pyhotn 3.5, we're not using it for the
+    # tests anyway, so this is ok.
+    - sed 's/^black$//' -i requirements_dev.txt
     - pip install --quiet --requirement requirements_dev.txt
     - tox -e py35
 
