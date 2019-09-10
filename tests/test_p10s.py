@@ -21,13 +21,24 @@ def test_p10s_verbose(fixtures_dir):
     assert re.match("Compiling .*?/tests/fixtures/generator_data/p10s_relative_dir/simple.p10s\n  Rendering <p10s.terraform.Context> to out/simple.tf.json in .*?/tests/fixtures/generator_data/p10s_relative_dir\n", proc.stdout.decode("utf-8"))
 
 
-def test_p10s_alias(fixtures_dir):
+def test_terraform_subcommand(fixtures_dir):
     working_dir = fixtures_dir / 'generator_data' / 'p10s_relative_dir' / 'pwd'
     os.chdir(str(working_dir))
     proc = subprocess.run(["env", "PYTERRANETES_TERRAFORM=echo",
-                           "p10s", "tf",
+                           "p10s", "terraform",
                            "this", "is", "a test"],
                           check=True,
                           stdout=subprocess.PIPE,
                           stderr=subprocess.STDOUT)
     assert proc.stdout.decode("utf-8") == "this is a test\n"
+
+
+def test_tf_fail(fixtures_dir):
+    working_dir = fixtures_dir / 'generator_data' / 'p10s_relative_dir' / 'pwd'
+    os.chdir(str(working_dir))
+    proc = subprocess.run(["env", "PYTERRANETES_TERRAFORM=false",
+                           "p10s", "tf", "plan"],
+                          stdout=subprocess.PIPE,
+                          stderr=subprocess.STDOUT)
+    assert proc.returncode == 1
+    assert proc.stdout.decode("utf-8") == ""
