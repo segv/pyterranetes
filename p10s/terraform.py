@@ -1,5 +1,4 @@
-"""
-Generating terraform with pyterranetes is, as with kubernetes, just a
+"""Generating terraform with pyterranetes is, as with kubernetes, just a
 question of writing a p10s script which creates a
 ``terraform.Context`` object and adds terraform blocks to it:
 
@@ -9,26 +8,35 @@ question of writing a p10s script which creates a
 
     c = tf.Context()
 
+    # Fully explicit style
     c += tf.Variable("foo", dict(
         default=0
     ))
-
-    c += tf.variables(key="${data.terraform_remote_state.key}"})
 
     c += tf.Resource("type", "name", dict(
         var = 'value'
     ))
 
+    # Helper function
+    c += tf.variables(key="${data.terraform_remote_state.key}"})
+    c += tf.outputs(key="${module.m.key}"})
+
+    # HCL syntax if a large amount of code needs to be converted to
+    # pyterranetes quickly
     c += tf.from_hcl(""\"
         module "m" {
           source = "../m/"
         }
     ""\")
 
-    c += tf.outputs(key="${module.m.key}"})
+    # property/attribute syntax for a more pythonic feeling
+    c.resource.type.name = {
+        'key': 'value',
+    }
 
-    ...
-
+    c.module.name = {
+        'source': './modules/my-module/',
+    }
 
 For each terraform configuration block there is a corresponding python
 class. Depending on the block type and how it's used some of the
@@ -82,6 +90,28 @@ entry with key ``key`` and value a dict with the values of the
 corresponsding block. As pyterranetes only actually generates
 ``.tf.json`` and not ``.tf`` (hcl) files, there is also no ambiguity
 in the output.
+
+Alternatively there's another way to add blocks to a context using the
+properties ``resource``, ``module`` and ``variable`` (there is
+currently no equivalent auto syntax for provider, local or output
+blocks).
+
+.. code-block:: python
+
+    from p10s import tf
+
+    c = tf.Context()
+
+    c.resource.random_id.project_name = {
+        'byte_length': 8
+    }
+
+    c.module.mod = {
+        'source': './modules/module'
+    }
+
+    c.variable.name = 'default-value'
+
 """
 
 import collections.abc
@@ -167,6 +197,18 @@ class Context(BaseContext):
     def render(self):
         with self._output_stream() as tf_json:
             tf_json.write(json.dumps(self._render_data(), indent=4, sort_keys=True))
+
+    @property
+    def resource(self):
+        return AutoResource(self)
+
+    @property
+    def module(self):
+        return AutoModule(self)
+
+    @property
+    def variable(self):
+        return AutoVariable(self)
 
 
 class DuplicateBlockError(ValueError):
@@ -288,10 +330,9 @@ class TypeNameBlock(TerraformBlock):
 
     @name.setter
     def name(self, name):
-        self.data[self.KIND][self._type][name] = self.data[self.KIND][self._type][
-            self.name
-        ]
-        del self.data[self.KIND][self._type][self._name]
+        type_block = self.data[self.KIND][self._type]
+        type_block[name] = type_block[self._name]
+        del type_block[self._name]
         self._name = name
 
     def _key(self):
@@ -559,3 +600,52 @@ def from_hcl(hcl_string):
             "Expected exactly one block when using `from_hcl` but got %s blocks from %s"
             % (len(blocks), hcl_string)
         )
+
+
+class AutoResource:
+    def __init__(self, context):
+        self._context_ = context
+        self._type_ = None
+
+    def __getattr__(self, name):
+        if name in ["_type_", "_context_"]:
+            super().__getattribute__(name)
+        else:
+            self._type_ = name
+            return self
+
+    def __setattr__(self, name, body):
+        if name in ["_type_", "_context_"]:
+            super().__setattr__(name, body)
+        else:
+            if self._type_ is None:
+                raise Exception("Can't set name before _type_ is set.")
+            self._context_ += Resource(self._type_, name, body)
+
+
+class AutoModule:
+    def __init__(self, context):
+        self._context_ = context
+
+    def __setattr__(self, name, body):
+        if name in ["_context_"]:
+            super().__setattr__(name, body)
+        else:
+            self._context_ += Module(name, body)
+
+    def __setitem__(self, name, body):
+        self._context_ += Module(name, body)
+
+
+class AutoVariable:
+    def __init__(self, context):
+        self._context_ = context
+
+    def __setattr__(self, key, value):
+        if key in ["_context_"]:
+            super().__setattr__(key, value)
+        else:
+            self._context_ += Variable(key, {"default": value})
+
+    def __setitem__(self, name, value):
+        self._context_ += Variable(name, {"default": value})
