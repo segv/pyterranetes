@@ -402,3 +402,40 @@ def test_outputs():
         c='${var.c}')
     assert {'output': {'a': {'value': 'b'},
                        'c': {'value': '${var.c}'}}} == c.data
+
+
+def test_false_body():
+    t = tf.Resource("type", "name", 0)
+    assert t.data == {'resource': {'type': {'name': 0}}}
+
+    t = tf.Module("name", "")
+    assert t.data == {'module': {'name': ""}}
+
+
+def test_implicit_resource():
+    a = tf.Context()
+
+    a.resource.a.b = {'k': 'v1'}
+    a.resource.a.c = {'k': 'v2'}
+
+    b = tf.Context()
+    b += tf.Resource("a", "b", {'k': 'v1'})
+    b += tf.Resource("a", "c", {'k': 'v2'})
+
+    assert a.data == b.data
+
+
+def test_implicit_module():
+    c = tf.Context()
+
+    c.module.name = {}
+
+    assert {'module': {'name': {}}} == c.data
+
+
+def test_implicit_variable():
+    c = tf.Context()
+
+    c.variable.name = 'foo'
+
+    assert {'variable': {'name': {'default': 'foo'}}} == c.data
