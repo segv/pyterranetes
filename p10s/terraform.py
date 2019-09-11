@@ -223,7 +223,7 @@ class TerraformBlock:
 
 class NoArgsBlock(TerraformBlock):
     def __init__(self, body):
-        super().__init__({self.KIND: body or {}})
+        super().__init__({self.KIND: body})
 
     def _body(self):
         return self.data[self.KIND]
@@ -238,7 +238,8 @@ class NoArgsBlock(TerraformBlock):
 class NameBlock(TerraformBlock):
     def __init__(self, name, body=None):
         self._name = name
-        super().__init__({self.KIND: {name: body or {}}})
+        body = body if body is not None else {}
+        super().__init__({self.KIND: {name: body}})
 
     def _body(self):
         return self.data[self.KIND][self.name]
@@ -265,7 +266,8 @@ class TypeNameBlock(TerraformBlock):
     def __init__(self, type, name, body=None):
         self._type = type
         self._name = name
-        super().__init__({self.KIND: {type: {name: body or {}}}})
+        body = body if body is not None else {}
+        super().__init__({self.KIND: {type: {name: body}}})
 
     def _body(self):
         return self.data[self.KIND][self._type][self._name]

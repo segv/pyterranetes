@@ -402,3 +402,11 @@ def test_outputs():
         c='${var.c}')
     assert {'output': {'a': {'value': 'b'},
                        'c': {'value': '${var.c}'}}} == c.data
+
+
+def test_false_body():
+    t = tf.Resource("type", "name", 0)
+    assert t.data == {'resource': {'type': {'name': 0}}}
+
+    t = tf.Module("name", "")
+    assert t.data == {'module': {'name': ""}}
