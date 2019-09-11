@@ -1,7 +1,4 @@
 #!/usr/bin/env python3
-import os
-import subprocess
-import sys
 from pprint import pprint  # noqa: F401
 
 import click
@@ -41,14 +38,18 @@ def cli():
     pass
 
 
-@cli.command()
-@click.argument("filename", nargs=-1)
-@click.option("-v", "--verbose", type=bool, default=False, is_flag=True)
-def generate(filename, verbose):
+def _generate(filename, verbose):
     if len(filename) == 0:
         filename = ["."]
     for f in filename:
         Generator().generate(f, verbose=verbose)
+
+
+@cli.command()
+@click.argument("filename", nargs=-1)
+@click.option("-v", "--verbose", type=bool, default=False, is_flag=True)
+def generate(filename, verbose):
+    _generate(filename, verbose)
 
 
 @cli.command()
@@ -59,57 +60,6 @@ def watch(directory, ignore_dotfiles, verbose):
     watcher = Watcher(directory, ignore_dotfiles)
     watcher.install_signal_handlers()
     watcher.watch(verbose=bool(verbose))
-
-
-@cli.command()
-@click.option(
-    "--terraform", type=str, default="terraform", envvar="PYTERRANETES_TERRAFORM"
-)
-@click.argument("command", nargs=-1)
-def terraform(terraform, command):
-    Generator().generate(".")
-    os.execvp(terraform, [terraform] + list(command))
-
-
-@cli.command()
-@click.option(
-    "--terraform", type=str, default="terraform", envvar="PYTERRANETES_TERRAFORM"
-)
-@click.argument("command", nargs=1)
-def tf(terraform, command):
-    Generator().generate(".")
-
-    if command == "plan":
-        proc = subprocess.run(
-            "%s plan -detailed-exitcode" % terraform,
-            shell=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-        )
-
-        if proc.returncode == 0:
-            print("No changes. Infrastructure is up-to-date.")
-        else:
-            sys.stdout.buffer.write(proc.stdout)
-
-        sys.exit(proc.returncode)
-
-    if command == "apply":
-        proc = subprocess.run("%s apply -auto-approve" % terraform, shell=True)
-        sys.exit(proc.returncode)
-
-    raise Exception("Unknown command `%s`" % command)
-
-
-@cli.command()
-@click.option("--kubectl", type=str, default="terraform", envvar="PYTERRANETES_KUBECTL")
-@click.argument("command", nargs=-1)
-def kubectl(kubectl, command):
-    Generator().generate(".")
-    os.execvp(kubectl, [kubectl] + list(command))
-
-
-cli.add_mapping("kubectl", "k8s")
 
 
 @cli.command()
