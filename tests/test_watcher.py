@@ -31,7 +31,7 @@ class LoopExhausted(Exception):
 
 
 def wait_until(condition):
-    for i in range(300):
+    for i in range(50):
         v = condition()
         if v:
             return v
@@ -40,19 +40,20 @@ def wait_until(condition):
         raise LoopExhausted()
 
 
+@pytest.mark.flaky(reruns=3, reruns_delay=5)
 @pytest.mark.parametrize("signum", [signal.SIGTERM, signal.SIGINT])
 def test_watcher_signal(tmp_dir, signum):
     proc = subprocess.Popen(["p10s", "watch"], cwd=str(tmp_dir))
     try:
         proc.send_signal(signum)
 
-        for i in range(30):
+        def done():
             proc.poll()
-            if proc.returncode is not None:
-                break
-            else:
-                time.sleep(0.1)
-        else:
+            return proc.returncode is not None
+
+        try:
+            wait_until(done)
+        except LoopExhausted:
             pytest.fail("watch failed to terminate")
 
         if proc.returncode != -signum:
@@ -61,6 +62,7 @@ def test_watcher_signal(tmp_dir, signum):
         proc.kill()
 
 
+@pytest.mark.flaky(reruns=3, reruns_delay=5)
 @pytest.mark.slow
 def test_watcher_file_create(tmp_dir, simple_p10s):
     with p10s_process(["watch", "."], tmp_dir):
@@ -77,6 +79,7 @@ def test_watcher_file_create(tmp_dir, simple_p10s):
             pytest.fail("didn't build for newly created file %s in %s" % (new, tmp_dir))
 
 
+@pytest.mark.flaky(reruns=3, reruns_delay=5)
 @pytest.mark.slow
 def test_watcher_move(tmp_dir, simple_p10s):
     dst = tmp_dir / 'simple.p10s'
@@ -95,6 +98,7 @@ def test_watcher_move(tmp_dir, simple_p10s):
             pytest.fail("didn't build for moved file %s in %s" % (new_dst, tmp_dir))
 
 
+@pytest.mark.flaky(reruns=3, reruns_delay=10)
 @pytest.mark.slow
 def test_watcher_modify(tmp_dir, simple_p10s, pwd_p10s):
     dst = tmp_dir / 'simple.p10s'
