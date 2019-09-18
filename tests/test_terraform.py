@@ -425,7 +425,7 @@ def test_implicit_resource():
     assert a.data == b.data
 
 
-def test_implicit_module():
+def test_implicit_module1():
     c = tf.Context()
 
     c.module.name = {}
@@ -433,9 +433,25 @@ def test_implicit_module():
     assert {'module': {'name': {}}} == c.data
 
 
-def test_implicit_variable():
+def test_implicit_module2():
+    c = tf.Context()
+
+    c.module["name"] = {'source': 'here'}
+
+    assert {'module': {'name': {'source': 'here'}}} == c.data
+
+
+def test_implicit_variable1():
     c = tf.Context()
 
     c.variable.name = 'foo'
+
+    assert {'variable': {'name': {'default': 'foo'}}} == c.data
+
+
+def test_implicit_variable2():
+    c = tf.Context()
+
+    c.variable["name"] = 'foo'
 
     assert {'variable': {'name': {'default': 'foo'}}} == c.data

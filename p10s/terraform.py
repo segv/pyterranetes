@@ -648,4 +648,4 @@ class AutoVariable:
             self._context_ += Variable(key, {"default": value})
 
     def __setitem__(self, name, value):
-        self._context_ += Variable(name, {"default": value})
+        self.__setattr__(name, value)
