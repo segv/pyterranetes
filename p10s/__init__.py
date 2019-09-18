@@ -20,6 +20,7 @@ The following things are importable from this module:
 
 """
 
+import p10s.config_context as cfg
 import p10s.kubernetes as k8s
 import p10s.terraform as tf
 import p10s.values
