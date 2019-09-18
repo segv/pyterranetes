@@ -20,9 +20,10 @@ The following things are importable from this module:
 
 """
 
-import p10s.kubernetes as k8s  # noqa: F401
-import p10s.terraform as tf  # noqa: F401
-import p10s.values  # noqa: F401
-from p10s.__version__ import __version__  # noqa: F401
-from p10s.generator import register_context  # noqa: F401
-from p10s.loads import hcl, json, yaml  # noqa: F401
+import p10s.config_context as cfg
+import p10s.kubernetes as k8s
+import p10s.terraform as tf
+import p10s.values
+from p10s.__version__ import __version__
+from p10s.generator import register_context
+from p10s.loads import hcl, json, yaml

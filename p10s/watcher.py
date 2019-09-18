@@ -3,10 +3,9 @@ import subprocess
 import time
 from pathlib import Path
 
+import __main__ as main
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
-
-import __main__ as main
 
 
 class PyterranetesEventHandler(FileSystemEventHandler):

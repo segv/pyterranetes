@@ -115,16 +115,15 @@ blocks).
 """
 
 import collections.abc
-import json
 from copy import deepcopy
 from pprint import pformat
 
-from p10s.base import BaseContext
+from p10s.config_context import JSONContext
 from p10s.loads import hcl
 from p10s.utils import merge_dicts
 
 
-class Context(BaseContext):
+class Context(JSONContext):
     """Context for terraform files.
 
     As with the k8s.Context this instances of this class represent a
@@ -190,13 +189,6 @@ class Context(BaseContext):
         :param TerraformBlock block:
         """
         return deepcopy(self).add(block)
-
-    def _render_data(self):
-        return self.data
-
-    def render(self):
-        with self._output_stream() as tf_json:
-            tf_json.write(json.dumps(self._render_data(), indent=4, sort_keys=True))
 
     @property
     def resource(self):
@@ -648,4 +640,4 @@ class AutoVariable:
             self._context_ += Variable(key, {"default": value})
 
     def __setitem__(self, name, value):
-        self._context_ += Variable(name, {"default": value})
+        self.__setattr__(name, value)

@@ -37,5 +37,6 @@ etc.).
    code-structure
    terraform
    kubernetes
+   config
    utilities
    appendix

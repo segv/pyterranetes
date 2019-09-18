@@ -13,11 +13,20 @@ class BaseContext:
         if output is not None:
             self.output = Path(output)
         elif self.input is not None:
-            self.output = self.input.with_suffix(self.output_file_extension)
+            if hasattr(self, "output_file_extension"):
+                self.output = self.input.with_suffix(self.output_file_extension)
+            else:
+                raise Exception(
+                    "Required property output_file_extension missing on %s." % self
+                )
         else:
             self.output = None
 
     def render(self):
+        with self._output_stream() as stream:
+            self.render_to_stream(stream)
+
+    def render_to_stream(self, stream):
         raise NotImplementedError()  # pragma: no cover
 
     def _output_stream(self):
