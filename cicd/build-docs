@@ -1,0 +1,8 @@
+#!/bin/bash
+set -euo pipefail
+
+pip install --quiet sphinx --editable .
+sphinx-build -W ./docs ./public
+
+echo Done.
+echo browse file:///$(pwd)/public/index.html

@@ -36,21 +36,16 @@ test:py35:
 
 test:build-docs:
   stage: test-docs
-  script:
-    - pip install --quiet sphinx --editable .
-    - sphinx-build -W ./docs ./public
+  script: [ ./cicd/build-docs ]
 
 pages:
   stage: deploy
-  script:
-    - pip install --quiet sphinx --editable .
-    - sphinx-build -W ./docs ./public
+  script: [ ./cicd/build-docs ]
   artifacts:
     paths: [ ./public ]
   only: [ master ]
 
 pypi:
   stage: deploy
-  script:
-    - ./cicd/upload
+  script: [ ./cicd/upload ]
   only: [ master ]
