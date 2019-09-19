@@ -15,6 +15,7 @@ encoded data.
 """
 import configparser
 import json
+from collections.abc import Mapping, Sequence
 from copy import deepcopy
 
 from p10s.base import BaseContext
@@ -77,3 +78,95 @@ class JSONContext(ConfigContext):
 
     def render_to_stream(self, steam):
         json.dump(self.data, steam, indent=4, sort_keys=True)
+
+
+class UnknownDataTypeError(ValueError):
+    pass
+
+
+class DataAccessMismatch(ValueError):
+    pass
+
+
+class InvalidKeyType(ValueError):
+    pass
+
+
+class AutoData:
+    def __init__(self):
+        self._data = {}
+        self._type = None
+
+    def data(self):
+        if self._type is None:
+            return {}
+        elif self._type == Mapping:
+            d = {}
+            for key, value in self._data.items():
+                if isinstance(value, AutoData):
+                    d[key] = value.data()
+                else:
+                    d[key] = value
+            return d
+        elif self._type == Sequence:
+            d = []
+            for i in range(1 + max(self._data.keys())):
+                if i in self._data:
+                    v = self._data[i]
+                    if isinstance(v, AutoData):
+                        v = v.data()
+                else:
+                    v = None
+                d.append(v)
+            return d
+        else:
+            raise UnknownDataTypeError(
+                "Sorry, self._data is a %s, which we can't handle."
+                % self._data.__class__
+            )
+
+    #    def __getattr__(self, name):
+    #        if name in ["_data", "data"]:
+    #            super().__getattr__(name)
+    #        return self[name]
+
+    def _assert_for_key(self, key):
+        if isinstance(key, str):
+            if self._type is None:
+                self._type = Mapping
+            if self._type == Sequence:
+                raise DataAccessMismatch(
+                    "_data (%s) was a sequence but is now being accessed as a dict (%s)."
+                    % (self._data, key)
+                )
+        elif isinstance(key, int):
+            if self._type is None:
+                self._type = Sequence
+            if self._type == Mapping:
+                raise DataAccessMismatch(
+                    "_data was set to a dict (%s) but is now being accessed as an array (%s)."
+                )
+        else:
+            raise InvalidKeyType(
+                "Sorry, AutoData keys must be strings or ints, not %s (%s)"
+                % (key, key.__class__)
+            )
+
+    def __getitem__(self, key):
+        self._assert_for_key(key)
+
+        if key in self._data:
+            return self._data[key]
+        else:
+            return self.__setitem__(key, AutoData())
+
+    #    def __setattr__(self, name, value):
+    #        if name in ["_data", "data"]:
+    #            super().__setattr__(name, value)
+    #        self[name] = value
+    #        return value
+
+    def __setitem__(self, key, value):
+        self._assert_for_key(key)
+        self._data[key] = value
+        return value
