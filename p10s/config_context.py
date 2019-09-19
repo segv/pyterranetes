@@ -125,11 +125,6 @@ class AutoData:
                 % self._data.__class__
             )
 
-    #    def __getattr__(self, name):
-    #        if name in ["_data", "data"]:
-    #            super().__getattr__(name)
-    #        return self[name]
-
     def _assert_for_key(self, key):
         if isinstance(key, str):
             if self._type is None:
@@ -160,11 +155,19 @@ class AutoData:
         else:
             return self.__setitem__(key, AutoData())
 
-    #    def __setattr__(self, name, value):
-    #        if name in ["_data", "data"]:
-    #            super().__setattr__(name, value)
-    #        self[name] = value
-    #        return value
+    def __getattr__(self, name):
+        # NOTE _data and _type are actually on the object's __dict__
+        # so this method isn't called for those properties. This means
+        # it's important to always set them before attempting to read
+        # them. 20190919:mb
+        return self[name]
+
+    def __setattr__(self, name, value):
+        if name in ["_data", "_type"]:
+            return object.__setattr__(self, name, value)
+        else:
+            self[name] = value
+            return value
 
     def __setitem__(self, key, value):
         self._assert_for_key(key)
