@@ -58,6 +58,7 @@ will be able to properly parse it.
 from copy import deepcopy
 
 from p10s.base import BaseContext
+from p10s.config_context import AutoData
 from p10s.loads import ruamel, yaml, yaml_all
 from p10s.utils import merge_dicts
 
@@ -84,7 +85,7 @@ Really is just a YAML context.
         else:
             objects = object
         for o in objects:
-            if isinstance(o, Data):
+            if isinstance(o, (AutoData, Data, dict)):
                 self.data.append(o)
             else:
                 raise Exception(
@@ -100,7 +101,20 @@ Really is just a YAML context.
         return new.add(block)
 
     def _render_data(self):
-        return [data.render() for data in self.data]
+        documents = []
+        for doc in self.data:
+            if isinstance(doc, Data):
+                documents.append(doc.render())
+            elif isinstance(doc, AutoData):
+                documents.append(doc.data())
+            elif isinstance(doc, dict):
+                documents.append(doc)
+            else:
+                raise Exception(
+                    "%s is of type %s, which we don't know how to render."
+                    % (doc, type(doc))
+                )
+        return documents
 
     def render(self):
         with self._output_stream() as out:

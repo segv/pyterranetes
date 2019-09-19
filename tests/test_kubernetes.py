@@ -1,7 +1,9 @@
-import pytest
-from p10s import k8s
 from collections import OrderedDict
 import shutil
+
+import pytest
+
+from p10s import k8s, cfg
 
 
 @pytest.mark.parametrize('klass,kind', [(k8s.Service, 'Service'),
@@ -114,3 +116,18 @@ def test_create_output_dir(fixtures_dir):
     c.render()
 
     assert output_file.exists()
+
+
+def test_add_auto_data():
+    c = k8s.Context()
+    s = cfg.AutoData()
+    s.apiVersion = 'v1'
+    s.metadata.name = 'foobar'
+    c += s
+    assert c._render_data() == [{'apiVersion': 'v1', 'metadata': {'name': 'foobar'}}]
+
+
+def test_add_dict():
+    c = k8s.Context()
+    c += {'apiVersion': 'v1', 'containers': [{'name': 'bob'}]}
+    assert c._render_data() == [{'apiVersion': 'v1', 'containers': [{'name': 'bob'}]}]
