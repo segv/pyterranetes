@@ -221,9 +221,6 @@ class TerraformBlock:
         if data is not None:
             self.data = data
 
-    def render(self):
-        return self.data
-
     @property
     def body(self):
         """Returns the data contained in thie block. name, type, provider or
