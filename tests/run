@@ -7,15 +7,7 @@ export PYTHONPATH=${PROJECT_ROOT}
 
 pip install -U -e ${PROJECT_ROOT}
 
-# NOTE i don't know how to cleanly copy $@ to $ARGS. so if $@ is empty
-# we set ARGS to what we'd like it do be, if it's not empty we set
-# args to nothing. then we pass both to pyest. this way we get the
-# defaulting args behaviour we want and don't need to copy $@ to
-# another variable. would be nice to make this cleaner 20181229:mb
-if [[ $# -eq 0 ]]; then
-    ARGS=("--lf" "--cov=p10s")
-else
-    ARGS=""
-fi
+PYTERRANETES_INSTALL_DIR=$(python -c 'import p10s as _; print(_.__path__[0])')
 
-pytest -vvv "$ARGS" "$@" ${PROJECT_ROOT}/tests/
+pytest -vvv "--cov=${PYTERRANETES_INSTALL_DIR}" "$@" ${PROJECT_ROOT}/tests/
+coverage html

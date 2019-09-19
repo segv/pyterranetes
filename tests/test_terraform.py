@@ -9,6 +9,28 @@ def test_init():
     assert c.data == {}
 
 
+def test_eq1():
+    a = tf.TerraformBlock({'type': {'name': 'value'}})
+    assert a == a
+
+
+def test_eq2():
+    a = tf.TerraformBlock({'type': {'name': 2}})
+    b = tf.TerraformBlock({'type': {'name': 1 + 1}})
+    assert a == b
+
+
+def test_neq1():
+    a = tf.TerraformBlock({'type': {'name': 2}})
+    b = tf.TerraformBlock({'type': {'name': 1}})
+    assert a != b
+
+
+def test_neq2():
+    a = tf.TerraformBlock({'type': {'name': 2}})
+    assert a != "not a block"
+
+
 def test_variable1():
     c = tf.Context()
     c += tf.Variable('foo')
