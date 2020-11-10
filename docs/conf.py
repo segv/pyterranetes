@@ -85,7 +85,7 @@ html_theme = 'alabaster'
 html_theme_options = {
     'fixed_sidebar': True,
     'extra_nav_links': {
-        'Source Code': 'https://gitlab.com/sig11/pyterranetes'
+        'Source Code': 'https://gitlab.com/segv/pyterranetes'
     }
 }
 

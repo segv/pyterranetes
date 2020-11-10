@@ -66,8 +66,7 @@ from p10s.utils import merge_dicts
 class Context(BaseContext):
     """Context class for generating kubernetes and helm files.
 
-Really is just a YAML context.
-"""
+    Really is just a YAML context."""
 
     output_file_extension = ".yaml"
 
@@ -248,6 +247,5 @@ def from_yaml(yaml_input):
 
 
 def many_from_yaml(yaml_input):
-    """Parse the documents from ``yaml_input`` and returns a list of ``KubernetesObject``.
-"""
+    """Parse the documents from ``yaml_input`` and returns a list of ``KubernetesObject``."""
     return [_data_to_object(data) for data in yaml_all(yaml_input)]

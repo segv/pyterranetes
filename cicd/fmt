@@ -1,5 +1,5 @@
 #!/bin/bash
 set -xe
 
-isort -rc ./bin/p10s ./p10s
+isort ./bin/p10s ./p10s
 black ./bin/p10s ./p10s

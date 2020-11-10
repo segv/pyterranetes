@@ -17,8 +17,6 @@ Objects
 .. autoclass:: p10s.kubernetes.StatefulSet
 .. autoclass:: p10s.kubernetes.Ingress
 .. autoclass:: p10s.kubernetes.Secret
-.. autofunction:: p10s.kubernetes.from_yaml
-.. autofunction:: p10s.kubernetes.many_from_yaml
 
 Helpers
 -------

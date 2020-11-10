@@ -11,18 +11,18 @@ from p10s.utils import merge_dicts
 class Values(MutableMapping):
     """Class for storing p10s value mappings.
 
-Can be used as a dict. Has classmethods, such as
-:py:meth:`p10s.values.Values.from_files` for loading values from
-various sources.
+    Can be used as a dict. Has classmethods, such as
+    :py:meth:`p10s.values.Values.from_files` for loading values from
+    various sources.
 
-The assumption is that Values won't be created directly, though that's
-certainly possible, but that they're be created from external
-source. If, for example, we want to have our values stored in a yaml
-on disk, and allow over riding form the env, we would this:
+    The assumption is that Values won't be created directly, though that's
+    certainly possible, but that they're be created from external
+    source. If, for example, we want to have our values stored in a yaml
+    on disk, and allow over riding form the env, we would this:
 
-.. code-block:: python
+    .. code-block:: python
 
-    VALUES = Values.from_files(".") + Values.from_environ(".")
+        VALUES = Values.from_files(".") + Values.from_environ(".")
 
 
     """
@@ -36,12 +36,12 @@ on disk, and allow over riding form the env, we would this:
     @classmethod
     def from_files(cls, basedir):
         """Builds a Values object from a hierarchically organzied collections
-of yaml files.
+        of yaml files.
 
-All the files named ``values.yaml`` in basedir and up the file system
-(up until the file system's root) will be collected and parsed and
-merged. The merging is top down, so values specifed in files closer to
-basedir will over ride values specified in a higher up values file.
+        All the files named ``values.yaml`` in basedir and up the file system
+        (up until the file system's root) will be collected and parsed and
+        merged. The merging is top down, so values specifed in files closer to
+        basedir will over ride values specified in a higher up values file.
         """
         basedir = Path(basedir)
         if not basedir.exists():
@@ -127,12 +127,12 @@ def use_values(values):
 @contextmanager
 def values(*args, **kwargs):
     """context manager, runs the body with the given key=value pairs
-bound.
+    bound.
 
-``*args`` is a list of dicts, whose final values will be computed as
-by :func:``merge_dicts <p10s.utils.merge_dicts>`. ``*kwargs`` are
-tweated as a single dict of key=value pairs, and take precedence over
-anything in ``*args``.
+    ``*args`` is a list of dicts, whose final values will be computed as
+    by :func:``merge_dicts <p10s.utils.merge_dicts>`. ``*kwargs`` are
+    tweated as a single dict of key=value pairs, and take precedence over
+    anything in ``*args``.
 
     """
     global VALUES

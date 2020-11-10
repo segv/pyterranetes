@@ -12,7 +12,7 @@ from setuptools import find_packages, setup, Command
 # Package meta-data.
 NAME = 'pyterranetes'
 DESCRIPTION = "A toolkit for reducing duplication in terraform and k8s code."
-URL = 'https://sig11.gitlab.io/pyterranetes/'
+URL = 'https://segv.gitlab.io/pyterranetes/'
 EMAIL = 'mb@bese.it'
 AUTHOR = 'Marco Baringer'
 REQUIRES_PYTHON = '>=3.5.0'
@@ -20,10 +20,10 @@ VERSION = None
 
 # What packages are required for this module to be executed?
 REQUIRED = [
-    'Click==7.0',
-    'ruamel.yaml==0.15.81',
-    'pyhcl==0.3.12',
-    'watchdog==0.9.0'
+    'Click==7.1.2',
+    'ruamel.yaml==0.16.12',
+    'pyhcl==0.4.4',
+    'watchdog==0.10.3'
 ]
 
 # What packages are optional?
@@ -103,9 +103,10 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
     ],
     # $ setup.py publish support.
     cmdclass={

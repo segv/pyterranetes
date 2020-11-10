@@ -38,10 +38,10 @@ def _data(object):
 
 def yaml(input):
     """Parses ``input`` as a single yaml document and returns the
-corresponding python data structure.
+    corresponding python data structure.
 
-:param input: the source of the yaml
-:type input: str, Path or IOBase
+    :param input: the source of the yaml
+    :type input: str, Path or IOBase
     """
     try:
         return ruamel.load(_data(input))
@@ -53,9 +53,8 @@ corresponding python data structure.
 def yaml_all(input):
     """Parses ``input`` as multiple yaml documents and returns a list of python objects (dicts, lists, etc.)
 
-:param input: the source of the yaml
-:type input: str, Path or IOBase
-"""
+    :param input: the source of the yaml
+    :type input: str, Path or IOBase"""
     try:
         return ruamel.load_all(_data(input))
     except Exception as e:
@@ -66,76 +65,74 @@ def yaml_all(input):
 def hcl(input):
     """Parses ``input`` as a hcl code and returns the corresponding python dict.
 
-As with terraform's json syntax blocks are converted to nested dicts:
+    As with terraform's json syntax blocks are converted to nested dicts:
 
-.. code-block:: text
+    .. code-block:: text
 
-    terraform {
-      a = "b"
-    }
+        terraform {
+          a = "b"
+        }
 
-parses to
+    parses to
 
-.. code-block:: python
+    .. code-block:: python
 
-    {'terraform':
-        {'a': 'b'}
-    }
+        {'terraform':
+            {'a': 'b'}
+        }
 
-and this:
+    and this:
 
-.. code-block:: terraform
+    .. code-block:: terraform
 
-    resource "type" "name" {
-      a = "b"
-    }
+        resource "type" "name" {
+          a = "b"
+        }
 
-parses to
+    parses to
 
-.. code-block:: python
+    .. code-block:: python
 
-    {'resource':
-        {'type':
-            {'name':
-                {'a': 'b'}
+        {'resource':
+            {'type':
+                {'name':
+                    {'a': 'b'}
+                }
             }
         }
-    }
 
-Multiple blocks are merged into a single dict as per the tf.json format:
+    Multiple blocks are merged into a single dict as per the tf.json format:
 
-.. code-block:: terraform
+    .. code-block:: terraform
 
-    resource "type" "first" {
-      a = "b"
-    }
-    resource "type" "second" {
-      a = "b"
-    }
-
-parses to
-
-.. code-block:: python
-
-    {'resource':
-        {'type':
-            {'first':  {'a': 'b'}},
-            {'second': {'a': 'b'}},
+        resource "type" "first" {
+          a = "b"
         }
-    }
+        resource "type" "second" {
+          a = "b"
+        }
 
-:param input: the source of the hcl
-:type input: str, Path or IOBase
-"""
+    parses to
+
+    .. code-block:: python
+
+        {'resource':
+            {'type':
+                {'first':  {'a': 'b'}},
+                {'second': {'a': 'b'}},
+            }
+        }
+
+    :param input: the source of the hcl
+    :type input: str, Path or IOBase"""
     return pyhcl.loads(_data(input))
 
 
 def json(input):
     """Parses ``input`` as a single json object.
 
-:param input: the source of the json
-:type input: str, Path or IOBase
-"""
+    :param input: the source of the json
+    :type input: str, Path or IOBase"""
     return json_lib.loads(_data(input))
 
 

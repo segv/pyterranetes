@@ -2,7 +2,7 @@ import configparser
 import json
 
 import pytest
-import yaml
+from ruamel.yaml import YAML
 
 from pathlib import Path
 
@@ -66,7 +66,7 @@ def test_yaml(tmp_dir):
     assert output.exists()
     out = output.open("r")
 
-    assert yaml.safe_load(out) == DATUM
+    assert YAML(typ='safe').load(out) == DATUM
 
 
 def test_auto_empty_data():
