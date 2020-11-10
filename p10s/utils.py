@@ -1,6 +1,6 @@
 def merge_dicts(*args):
     """Creates a new dict by merging together the values in
-``args``. Values to the "right" over ride values in the "left"."""
+    ``args``. Values to the "right" over ride values in the "left"."""
     if len(args) == 0:
         return {}
     elif len(args) == 1:

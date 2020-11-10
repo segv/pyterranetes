@@ -1,0 +1,14 @@
+-e .
+pip-tools
+black
+flake8
+isort
+pytest
+pytest-rerunfailures
+pytest-mock
+pytest-cov
+pytest-timeout
+sphinx
+tox
+tox-pyenv
+twine

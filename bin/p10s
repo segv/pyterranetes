@@ -2,6 +2,7 @@
 from pprint import pprint  # noqa: F401
 
 import click
+
 from p10s.__version__ import __version__
 from p10s.generator import Generator
 from p10s.watcher import Watcher

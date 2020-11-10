@@ -1,6 +1,6 @@
 #!/bin/bash
 set -xe
 
-isort -c -rc ./bin/p10s ./p10s
+isort -c ./bin/p10s ./p10s
 black --check ./bin/p10s ./p10s
 flake8 ./bin ./p10s

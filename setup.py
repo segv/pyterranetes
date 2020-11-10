@@ -20,10 +20,10 @@ VERSION = None
 
 # What packages are required for this module to be executed?
 REQUIRED = [
-    'Click==7.0',
-    'ruamel.yaml==0.15.81',
-    'pyhcl==0.3.12',
-    'watchdog==0.9.0'
+    'Click==7.1.2',
+    'ruamel.yaml==0.16.12',
+    'pyhcl==0.4.4',
+    'watchdog==0.10.3'
 ]
 
 # What packages are optional?
