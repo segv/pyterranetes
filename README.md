@@ -7,4 +7,4 @@ configs.
 
 ## Links
 
-- [docs](https://sig11.gitlab.io/pyterranetes/)
+- [docs](https://segv.gitlab.io/pyterranetes/)

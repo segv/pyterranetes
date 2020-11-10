@@ -12,7 +12,7 @@ from setuptools import find_packages, setup, Command
 # Package meta-data.
 NAME = 'pyterranetes'
 DESCRIPTION = "A toolkit for reducing duplication in terraform and k8s code."
-URL = 'https://sig11.gitlab.io/pyterranetes/'
+URL = 'https://segv.gitlab.io/pyterranetes/'
 EMAIL = 'mb@bese.it'
 AUTHOR = 'Marco Baringer'
 REQUIRES_PYTHON = '>=3.5.0'
