@@ -10,13 +10,6 @@ lint:
     - pip install --quiet --requirement requirements_dev.txt
     - ./cicd/lint
 
-test:py37:
-  stage: test-python
-  script:
-    - pip install --quiet --requirement requirements_dev.txt
-    - tox -e py37
-  coverage: '/^TOTAL.*\s(\d+)%\s*$/'
-
 test:py36:
   stage: test-python
   image: python:3.6
@@ -24,15 +17,29 @@ test:py36:
     - pip install --quiet --requirement requirements_dev.txt
     - tox -e py36
 
-test:py35:
+test:py37:
   stage: test-python
-  image: python:3.5
+  image: python:3.7
   script:
-    # black doesn't run on pyhotn 3.5, we're not using it for the
-    # tests anyway, so this is ok.
-    - sed 's/^black$//' -i requirements_dev.txt
     - pip install --quiet --requirement requirements_dev.txt
-    - tox -e py35
+    - tox -e py37
+  coverage: '/^TOTAL.*\s(\d+)%\s*$/'
+
+test:py38:
+  stage: test-python
+  image: python:3.8
+  script:
+    - pip install --quiet --requirement requirements_dev.txt
+    - tox -e py38
+  coverage: '/^TOTAL.*\s(\d+)%\s*$/'
+
+test:py39:
+  stage: test-python
+  image: python:3.9
+  script:
+    - pip install --quiet --requirement requirements_dev.txt
+    - tox -e py39
+  coverage: '/^TOTAL.*\s(\d+)%\s*$/'
 
 test:build-docs:
   stage: test-docs
